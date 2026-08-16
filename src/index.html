@@ -85,43 +85,89 @@ body.instant *, body.instant *::before, body.instant *::after {
   animation-delay: 0s !important;
 }
 
-/* ── intro ── */
+/* ── intro ─────────────────────────────────────────────
+   Asymmetric: the type block sits upper-left, the weight of the
+   page is the empty lower-right. Blue dots drift behind it. */
 #intro {
   position: fixed;
   inset: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 1.4rem;
+  padding: 1.4rem max(1.4rem, 8vw);
   z-index: 5;
   transition: opacity .45s ease;
 }
 #intro.leave { opacity: 0; pointer-events: none; }
-#intro > * { max-width: 100%; }
+
+.intro-block {
+  position: relative;
+  z-index: 2;
+  max-width: 22rem;
+  margin-bottom: 14svh; /* pushes the block up; emptiness below */
+}
+.intro-block > * { max-width: 100%; }
 
 .intro-title {
-  font-size: clamp(2rem, 9vw, 2.9rem);
+  font-size: clamp(2.6rem, 13vw, 3.9rem);
   font-weight: 500;
-  letter-spacing: .06em;
+  letter-spacing: .04em;
   color: var(--ink);
+  line-height: 1.15;
 }
 .intro-byline {
-  margin-top: 1.4rem;
+  margin-top: 1.6rem;
   font-size: .66rem;
-  letter-spacing: .1em;
-  color: var(--ink-40);
-}
-.intro-rule { width: 26px; height: 2px; background: var(--blue); margin: 3.2rem 0; }
-.intro-epigraph {
-  font-size: clamp(.98rem, 4.2vw, 1.12rem);
-  line-height: 2.3;
+  line-height: 2.1;
   letter-spacing: .08em;
-  margin: 0 0 3.6rem;
-  color: var(--ink-90);
+  color: var(--ink-40);
+  max-width: 17rem;
 }
-.intro-modes { display: flex; gap: 1.6rem; }
+.intro-byline a {
+  color: var(--ink-55);
+  text-decoration: none;
+  border-bottom: 1px solid var(--blue);
+  padding-bottom: .15em;
+}
+.intro-rule { width: 26px; height: 2px; background: var(--blue); margin: 2.8rem 0; }
+.intro-epigraph {
+  font-size: clamp(.98rem, 4.4vw, 1.1rem);
+  line-height: 2.2;
+  letter-spacing: .05em;
+  margin: 0 0 3rem;
+  color: var(--ink-90);
+  line-break: strict;
+  text-spacing-trim: trim-start;
+}
+.intro-modes { display: flex; gap: 1.1rem; }
+
+/* corner stamp — signature, not instruction */
+.intro-mark {
+  position: absolute;
+  right: max(1.4rem, 8vw);
+  bottom: max(2.4rem, env(safe-area-inset-bottom));
+  font-size: .6rem;
+  letter-spacing: .22em;
+  color: var(--ink-40);
+  z-index: 2;
+}
+
+/* ── drifting blue dots ── */
+.dots { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.dot {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--blue);
+  opacity: 0;
+  animation: dotIn .9s ease forwards, drift linear infinite;
+}
+@keyframes dotIn { to { opacity: var(--o, .9); } }
+@keyframes drift {
+  0%, 100% { translate: 0 0; }
+  25%      { translate: 7px -11px; }
+  50%      { translate: -6px -4px; }
+  75%      { translate: 4px 9px; }
+}
 .mode-btn {
   font-family: inherit;
   font-size: .92rem;
@@ -206,7 +252,7 @@ body.instant *, body.instant *::before, body.instant *::after {
 }
 /* Each clause is atomic: lines may only break at punctuation, never
    mid-word. The <wbr> between clauses supplies the break opportunity. */
-.q .cl { display: inline-block; }
+.cl { display: inline-block; }
 .q .q-en {
   margin-top: 1.5em;
   font-size: .62em;
@@ -455,14 +501,19 @@ body.instant *, body.instant *::before, body.instant *::after {
 <body>
 
 <main id="intro">
-  <h1 class="intro-title rise d1">《對手》</h1>
-  <p class="intro-byline rise d2">這是根據《無用之用 Master of None》的作者在意的事寫成的牌組。</p>
-  <div class="intro-rule rise d3"></div>
-  <p class="intro-epigraph rise d4">所有答案只代表今天的你。明天可以翻案。</p>
-  <div class="intro-modes rise d5">
-    <button class="mode-btn" data-mode="acts">照三幕</button>
-    <button class="mode-btn" data-mode="shuffle">亂序</button>
+  <div class="dots" id="dots"></div>
+  <div class="intro-block">
+    <h1 class="intro-title rise d1">《對手》</h1>
+    <!-- split into atomic halves so the line breaks after 》, not mid-word -->
+    <p class="intro-byline rise d2"><span class="cl">這是根據<a href="https://masterofnonewithsunnyc.substack.com/p/2025h218" target="_blank" rel="noopener">《無用之用 Master of None》</a></span><wbr><span class="cl">的作者在意的事寫成的牌組。</span></p>
+    <div class="intro-rule rise d3"></div>
+    <p class="intro-epigraph rise d4">所有答案只代表今天的你。明天可以翻案。</p>
+    <div class="intro-modes rise d5">
+      <button class="mode-btn" data-mode="acts">照三幕</button>
+      <button class="mode-btn" data-mode="shuffle">亂序</button>
+    </div>
   </div>
+  <div class="intro-mark rise d5">TAIPEI 2026</div>
 </main>
 
 <div class="stage">
@@ -871,6 +922,26 @@ body.instant *, body.instant *::before, body.instant *::after {
   function endGame() {
     nextBtn.classList.add('hidden');
     setTimeout(() => $('replay').classList.add('show'), RM ? 100 : 1400);
+  }
+
+  // ── drifting blue dots（x%, y%, px, opacity, drift seconds）──
+  const DOTS = [
+    [ 82,  9, 10, .95, 26], [ 91, 21,  5, .75, 34], [ 70, 16,  6, .6,  30],
+    [ 88, 44,  8, .85, 38], [ 76, 62,  5, .55, 29], [ 94, 71, 11, .9,  33],
+    [ 63, 82,  7, .7,  27], [ 84, 89,  5, .5,  36], [ 47, 93,  9, .8,  31],
+    [ 12, 88,  6, .6,  35], [  5, 66,  9, .85, 28], [ 26, 74,  4, .45, 32],
+    [  8, 12,  5, .55, 30], [ 33,  6,  7, .7,  37], [ 58, 30,  4, .4,  25],
+  ];
+  {
+    const wrap = $('dots');
+    DOTS.forEach(([x, y, s, o, dur], i) => {
+      const d = document.createElement('div');
+      d.className = 'dot';
+      d.style.cssText =
+        `left:${x}%;top:${y}%;width:${s}px;height:${s}px;--o:${o};` +
+        `animation-delay:${1 + i * .07}s, ${i * .4}s;animation-duration:.9s, ${dur}s`;
+      wrap.appendChild(d);
+    });
   }
 
   // ── inputs ──
