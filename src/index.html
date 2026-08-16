@@ -109,11 +109,59 @@ body.instant *, body.instant *::before, body.instant *::after {
 .intro-block > * { max-width: 100%; }
 
 .intro-title {
-  font-size: clamp(2.6rem, 13vw, 3.9rem);
   font-weight: 500;
-  letter-spacing: .04em;
   color: var(--ink);
-  line-height: 1.15;
+  line-height: 1.1;
+}
+.t-zh, .t-en { display: block; }
+.t-en { color: var(--blue); }
+
+/* ── TEMP title gallery（A/B/C）—— 選定後只留一個 ── */
+
+/* A 寬字距＋Latin 副標：兩個字撐開成一道橫向的量體 */
+body[data-t="a"] .t-zh {
+  font-size: clamp(2.8rem, 16vw, 4.6rem);
+  letter-spacing: .42em;
+  text-indent: .42em;
+}
+body[data-t="a"] .t-en {
+  margin-top: 1.1rem;
+  font-size: .68rem;
+  letter-spacing: .72em;
+  text-indent: .72em;
+}
+
+/* B 直排：像書背，字更大，Latin 貼在右側轉九十度 */
+body[data-t="b"] .intro-title {
+  display: flex;
+  align-items: flex-start;
+  gap: .9rem;
+}
+body[data-t="b"] .t-zh {
+  writing-mode: vertical-rl;
+  font-size: clamp(3rem, 19vw, 5.4rem);
+  letter-spacing: .12em;
+}
+body[data-t="b"] .t-en {
+  writing-mode: vertical-rl;
+  font-size: .62rem;
+  letter-spacing: .5em;
+  margin-top: .5rem;
+}
+
+/* C 超大實心：字距收緊、Latin 與細線同一行，最接近海報標題 */
+body[data-t="c"] .t-zh {
+  font-size: clamp(3.4rem, 22vw, 6rem);
+  letter-spacing: -.02em;
+}
+body[data-t="c"] .t-en {
+  margin-top: .9rem;
+  font-size: .62rem;
+  letter-spacing: .55em;
+  text-indent: .55em;
+  border-top: 2px solid var(--blue);
+  padding-top: .7rem;
+  display: inline-block;
 }
 .intro-byline {
   margin-top: 1.6rem;
@@ -503,11 +551,11 @@ body.instant *, body.instant *::before, body.instant *::after {
 <main id="intro">
   <div class="dots" id="dots"></div>
   <div class="intro-block">
-    <h1 class="intro-title rise d1">《對手》</h1>
+    <h1 class="intro-title rise d1"><span class="t-zh">對手</span><span class="t-en">RIVALRY</span></h1>
     <!-- split into atomic halves so the line breaks after 》, not mid-word -->
     <p class="intro-byline rise d2"><span class="cl">這是根據<a href="https://masterofnonewithsunnyc.substack.com/p/2025h218" target="_blank" rel="noopener">《無用之用 Master of None》</a></span><wbr><span class="cl">的作者在意的事寫成的牌組。</span></p>
     <div class="intro-rule rise d3"></div>
-    <p class="intro-epigraph rise d4">所有答案只代表今天的你。明天可以翻案。</p>
+    <p class="intro-epigraph rise d4">所有答案只代表今天的你</p>
     <div class="intro-modes rise d5">
       <button class="mode-btn" data-mode="acts">照三幕</button>
       <button class="mode-btn" data-mode="shuffle">亂序</button>
@@ -1034,6 +1082,9 @@ body.instant *, body.instant *::before, body.instant *::after {
   }
 
   window.addEventListener('resize', () => { if (fanEls.length) refan(); });
+
+  // TEMP title gallery: #t-a / #t-b / #t-c
+  document.body.dataset.t = (location.hash.match(/#t-([abc])/) || [, 'a'])[1];
 
   // ── TEMP screenshot hooks（#shot-table / #shot-fan / #shot-staged / #shot-shuffle / #shot-end）──
   const shot = location.hash.match(/^#shot-(\w+)$/);
