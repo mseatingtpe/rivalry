@@ -8,19 +8,26 @@
 /*__FONT_CSS__*/
 
 /* ── tokens ─────────────────────────────────────────────
-   Single hue only: warm paper + one ink color; every
-   secondary tone is the same ink at reduced alpha. */
+   Night ink. Single hue: one pale tone over deep ink desk;
+   every secondary is the same pale at reduced alpha. */
 :root {
-  --paper:    #f1ecdf;
-  --paper-hi: #f7f3e9;
-  --paper-lo: #e7e0cd;
-  --ink:      #221d12;
-  --ink-70:   rgba(34, 29, 18, .70);
-  --ink-45:   rgba(34, 29, 18, .45);
-  --ink-28:   rgba(34, 29, 18, .28);
+  --desk-hi: #1c1c21;
+  --desk:    #141417;
+  --desk-lo: #0d0d10;
+  --face-hi: #202026;
+  --face:    #1a1a1f;
+  --face-lo: #16161a;
+  --back-hi: #18181d;
+  --back-lo: #121216;
+  --pale:    #e6e5e1;
+  --pale-90: rgba(230, 229, 225, .90);
+  --pale-55: rgba(230, 229, 225, .55);
+  --pale-40: rgba(230, 229, 225, .40);
+  --pale-25: rgba(230, 229, 225, .25);
+  --pale-12: rgba(230, 229, 225, .12);
   --mono: "Rivalry Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  /* portrait 2:3 — height-driven, width = height ÷ 1.5 */
-  --card-h: min(62svh, 128vw);
+  --card-h: min(46svh, 108vw);          /* staged card */
+  --back-h: clamp(88px, 14svh, 124px);  /* table card backs */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,91 +36,90 @@ html, body { height: 100%; }
 
 body {
   font-family: var(--mono);
-  color: var(--ink);
-  background-color: var(--paper);
-  /* light falls from above — same hue, luminosity only */
-  background-image: radial-gradient(130% 100% at 50% -8%,
-    var(--paper-hi) 0%, var(--paper) 55%, var(--paper-lo) 100%);
+  color: var(--pale-90);
+  background-color: var(--desk);
+  background-image: radial-gradient(130% 90% at 50% -10%,
+    var(--desk-hi) 0%, var(--desk) 55%, var(--desk-lo) 100%);
   background-attachment: fixed;
   min-height: 100vh;
   min-height: 100dvh;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
-  overflow: hidden;
+  touch-action: manipulation;
 }
 
-/* paper grain — inline SVG turbulence, never blocks touches */
+/* paper grain — inline turbulence, never blocks touches */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 99;
   pointer-events: none;
-  opacity: .04;
+  opacity: .05;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="220" height="220" filter="url(%23n)"/></svg>');
 }
 
-/* ── screens ── */
-.screen {
+.hidden { display: none !important; }
+body.instant *, body.instant *::before, body.instant *::after {
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+
+/* ── intro ── */
+#intro {
   position: fixed;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: max(1.4rem, env(safe-area-inset-top)) 1.4rem max(1.4rem, env(safe-area-inset-bottom));
+  text-align: center;
+  padding: 1.4rem;
+  z-index: 5;
+  transition: opacity .45s ease;
 }
-.hidden { display: none; }
-.screen > * { max-width: 100%; } /* long CJK lines must wrap, not push the column */
-
-/* ── intro ── */
-#intro { text-align: center; }
+#intro.leave { opacity: 0; pointer-events: none; }
+#intro > * { max-width: 100%; }
 
 .intro-title {
   font-size: clamp(2rem, 9vw, 2.9rem);
   font-weight: 500;
   letter-spacing: .06em;
+  color: var(--pale);
 }
-
 .intro-byline {
   margin-top: 1.4rem;
   font-size: .66rem;
   letter-spacing: .1em;
-  color: var(--ink-45);
+  color: var(--pale-40);
 }
-
-.intro-rule {
-  width: 26px;
-  height: 1px;
-  background: var(--ink-45);
-  margin: 3.2rem 0;
-}
-
+.intro-rule { width: 26px; height: 1px; background: var(--pale-40); margin: 3.2rem 0; }
 .intro-epigraph {
   font-size: clamp(.98rem, 4.2vw, 1.12rem);
   line-height: 2.3;
   letter-spacing: .08em;
   margin: 0 0 3.6rem;
+  color: var(--pale-90);
 }
-
 .intro-modes { display: flex; gap: 1.6rem; }
-
 .mode-btn {
   font-family: inherit;
   font-size: .92rem;
   letter-spacing: .38em;
-  text-indent: .38em; /* recenter the letter-spaced label */
-  color: var(--ink);
+  text-indent: .38em;
+  color: var(--pale-90);
   background: transparent;
-  border: 1px solid var(--ink-70);
+  border: 1px solid var(--pale-55);
   padding: .78em 1.5em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background-color .25s ease, color .25s ease;
 }
-.mode-btn:active { background: var(--ink); color: var(--paper-hi); }
+.mode-btn:active { background: var(--pale); color: var(--desk); }
 
-/* staggered entrance: fade + gentle rise */
 .rise { opacity: 0; animation: rise 1s cubic-bezier(.22,.61,.36,1) forwards; }
 @keyframes rise {
   from { opacity: 0; transform: translateY(12px); }
@@ -125,229 +131,190 @@ body::after {
 .d4 { animation-delay: .82s; }
 .d5 { animation-delay: 1.15s; }
 
-/* ── card ─────────────────────────────────────────────
-   The protagonist. Double frame: 1px near-black outer,
-   a thin translucent inner frame inset ~9px. A whisper of
-   vertical gradient for paper thickness — no drop shadow. */
+/* ── card face（舞台）─────────────────────────────── */
+.stage {
+  position: fixed;
+  left: 0; right: 0; top: 0;
+  height: 62svh;
+  pointer-events: none;
+}
 .card {
-  position: relative;
+  position: absolute; /* both stage cards stack dead-center */
+  inset: 0;
+  margin: auto;
   height: var(--card-h);
   width: calc(var(--card-h) / 1.5);
-  border: 1px solid var(--ink);
-  background-image: linear-gradient(180deg,
-    var(--paper-hi) 0%, var(--paper) 58%, #ebe4d2 100%);
+  border: 1px solid var(--pale-55);
+  background-image: linear-gradient(180deg, var(--face-hi) 0%, var(--face) 58%, var(--face-lo) 100%);
   display: flex;
   align-items: center;
-  padding: calc(9px + 2rem) calc(9px + 1.5rem);
+  padding: calc(9px + 1.9rem) calc(9px + 1.4rem);
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+  opacity: 0;
 }
 .card::before { /* inner frame */
   content: "";
   position: absolute;
   inset: 9px;
-  border: 1px solid var(--ink-28);
+  border: 1px solid var(--pale-25);
   pointer-events: none;
 }
-
 .card .act-label {
   position: absolute;
-  top: calc(9px + 1.15rem);
-  left: 0;
-  right: 0;
+  top: calc(9px + 1.05rem);
+  left: 0; right: 0;
   text-align: center;
   font-size: .62rem;
   letter-spacing: .62em;
   text-indent: .62em;
-  color: var(--ink-45);
+  color: var(--pale-40);
 }
-
 .card .q {
   width: 100%;
-  font-size: clamp(.98rem, 2.4svh, 1.15rem);
-  line-height: 2.3;
+  font-size: clamp(.95rem, 2.3svh, 1.1rem);
+  line-height: 2.25;
   letter-spacing: .09em;
-  text-align: left;
+  color: var(--pale-90);
 }
 
-/* card back — same double-frame language, one tone deeper, unmarked */
-.card.back {
-  background-image: linear-gradient(180deg, #ece6d6 0%, #e6dfcc 58%, #e0d8c1 100%);
+/* enter / exit choreography — spring-flavored */
+.card.enter {
+  opacity: 1;
+  transform: none;
+  transition:
+    transform .62s cubic-bezier(.3, 1.18, .4, 1),
+    opacity .5s ease;
 }
+.card.exit {
+  opacity: 0;
+  transform: translateX(-9vw) rotate(-3.5deg) scale(.97);
+  transition: transform .4s cubic-bezier(.5, 0, .75, .6), opacity .38s ease;
+}
+.card.slow { transition-duration: 1.05s, .9s; }
 
-/* ── stage (Phase 2: static preview only) ── */
-#stage { gap: 2.6rem; }
-
-.next-btn {
-  font-family: inherit;
-  font-size: .78rem;
-  letter-spacing: .3em;
-  text-indent: .3em;
-  color: var(--ink-70);
-  background: transparent;
-  border: 1px solid var(--ink-28);
-  padding: .66em 1.4em;
+/* ── table（下方牌桌）─────────────────────────────── */
+.table {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: 38svh;
+  pointer-events: none;
+}
+.origin { /* fan / pile coordinate origin: bottom center */
+  position: absolute;
+  left: 50%;
+  bottom: max(4.5svh, env(safe-area-inset-bottom));
+  width: 0; height: 0;
+}
+.back {
+  position: absolute;
+  height: var(--back-h);
+  width: calc(var(--back-h) / 1.5);
+  left: calc(var(--back-h) / -3);  /* center on origin */
+  bottom: 0;
+  border: 1px solid var(--pale-40);
+  background-image: linear-gradient(180deg, var(--back-hi), var(--back-lo));
+  pointer-events: auto;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  transition:
+    transform .6s cubic-bezier(.3, 1.14, .42, 1),
+    opacity .45s ease;
 }
-.next-btn:active { background: var(--ink); color: var(--paper-hi); }
+.back::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--pale-25);
+  pointer-events: none;
+}
+.back.dim { opacity: .28; pointer-events: none; }
+.back.flying {
+  opacity: 0;
+  transition:
+    transform .5s cubic-bezier(.45, .05, .3, 1),
+    opacity .42s ease .1s;
+  z-index: 3;
+}
 
+.pile-label {
+  position: absolute;
+  bottom: calc(-1.55rem - env(safe-area-inset-bottom) * 0);
+  transform: translateX(-50%);
+  font-size: .58rem;
+  letter-spacing: .4em;
+  text-indent: .4em;
+  color: var(--pale-40);
+  white-space: nowrap;
+  transition: opacity .45s ease;
+}
+.pile-label.dim { opacity: .3; }
+
+/* ── chrome ── */
 .progress {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right));
   bottom: max(.9rem, env(safe-area-inset-bottom));
   font-size: .62rem;
   letter-spacing: .12em;
-  color: var(--ink-45);
+  color: var(--pale-40);
+  z-index: 4;
 }
-
-/* ══ TEMP style gallery（checkpoint A）══
-   Three variants for Sunny to pick from; the losers get deleted.
-   A 鉛字印刷 = refined base below. B 老借書卡. C 終端機票券. */
-
-.variant-switch {
+.next-btn {
   position: fixed;
-  top: max(.8rem, env(safe-area-inset-top));
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10;
-  display: flex;
-  gap: 1.4rem;
-}
-.variant-switch button {
+  bottom: 40.5svh; /* the seam between stage and table */
   font-family: inherit;
-  font-size: .7rem;
-  letter-spacing: .1em;
-  color: var(--ink-45);
-  background: none;
-  border: none;
-  padding: .4em .6em;
+  font-size: .68rem;
+  letter-spacing: .3em;
+  text-indent: .3em;
+  color: var(--pale-55);
+  background: transparent;
+  border: 1px solid var(--pale-25);
+  padding: .6em 1.3em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  z-index: 4;
+  transition: opacity .4s ease;
 }
-.variant-switch button.on { color: var(--ink); text-decoration: underline; text-underline-offset: .45em; }
-
-/* ── B 老借書卡：格線、戳章幕標、更深的墨 ── */
-body[data-variant="b"] {
-  --paper: #efe9d8;
-  --paper-hi: #f5f0e2;
-  --paper-lo: #e3dbc4;
-  --ink: #251f12;
-}
-body[data-variant="b"] .card::after { /* ruled lines, header area kept clear */
-  content: "";
-  position: absolute;
-  inset: calc(9px + 2.9rem) 9px 9px;
-  background-image: repeating-linear-gradient(to bottom,
-    rgba(37, 31, 18, .14) 0 1px, transparent 1px 2.5em);
-  pointer-events: none;
-}
-body[data-variant="b"] .card .act-label { /* stamp */
+.next-btn:active { background: var(--pale); color: var(--desk); }
+.replay {
+  position: fixed;
   left: 50%;
-  right: auto;
-  top: calc(9px + .95rem);
-  transform: translateX(-50%) rotate(-2deg);
-  border: 1px solid var(--ink-45);
-  padding: .38em .55em .3em 1.1em;
-  letter-spacing: .55em;
-  text-indent: 0;
-  color: var(--ink-70);
+  transform: translateX(-50%);
+  bottom: max(3.2svh, env(safe-area-inset-bottom));
+  font-family: inherit;
+  font-size: .72rem;
+  letter-spacing: .3em;
+  text-indent: .3em;
+  color: var(--pale-55);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--pale-25);
+  padding: .4em .2em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  transition: opacity .9s ease;
+  z-index: 4;
 }
-body[data-variant="b"] .progress {
-  border: 1px solid var(--ink-28);
-  padding: .35em .6em .3em;
-}
-body[data-variant="b"] .intro-rule { height: 3px; border-top: 1px solid var(--ink-45); border-bottom: 1px solid var(--ink-45); background: none; }
+.replay.show { opacity: 1; }
 
-/* ── C 終端機票券：暗桌面、虛線、括號幕標 ── */
-body[data-variant="c"] {
-  --paper: #eee8d7;
-  --paper-hi: #f2ecdc;
-  --paper-lo: #d9cfb2;
-}
-body[data-variant="c"] { background-image: radial-gradient(130% 100% at 50% -8%, #ece5d1 0%, #e2d9c0 55%, #d3c8a6 100%); }
-body[data-variant="c"] .card {
-  background-image: linear-gradient(180deg, #f8f4e8 0%, #f3eddc 58%, #ece4cd 100%);
-}
-body[data-variant="c"] .card::before { border-style: dashed; }
-body[data-variant="c"] .card::after { /* ticket tear-off line above the foot */
-  content: "";
-  position: absolute;
-  left: 9px; right: 9px; bottom: calc(9px + 2.2rem);
-  border-top: 1px dashed var(--ink-28);
-  pointer-events: none;
-}
-body[data-variant="c"] .card .act-label::before { content: "［"; }
-body[data-variant="c"] .card .act-label::after { content: "］"; }
-body[data-variant="c"] .card .act-label { letter-spacing: .4em; text-indent: 0; }
-body[data-variant="c"] .q { letter-spacing: .13em; }
-body[data-variant="c"] .mode-btn, body[data-variant="c"] .next-btn { border-style: dashed; }
-body[data-variant="c"] .intro-title { letter-spacing: .14em; text-indent: .14em; }
-
-/* ── D 像素：點陣字型、平塗、2px 格、疏點 dither ── */
-body[data-variant="d"] {
-  --mono: "Rivalry Pixel", ui-monospace, monospace;
-  --paper: #f0ebdd;
-  --paper-hi: #f4f0e3;
-  --paper-lo: #e2dbc6;
-  background-image: none; /* flat: pixels don't do soft light */
-  -webkit-font-smoothing: none;
-}
-body[data-variant="d"]::after { /* sparse pixel dither instead of turbulence */
-  opacity: .5;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><g fill="%23221d12" opacity="0.07"><rect x="2" y="1" width="1" height="1"/><rect x="9" y="4" width="1" height="1"/><rect x="5" y="8" width="1" height="1"/><rect x="11" y="10" width="1" height="1"/></g></svg>');
-}
-body[data-variant="d"] .card {
-  background-image: none;
-  background-color: var(--paper-hi);
-  border-width: 2px;
-}
-body[data-variant="d"] .card::before { inset: 8px; border-width: 2px; }
-body[data-variant="d"] .card .act-label {
-  font-size: 12px;
-  letter-spacing: 12px;
-  text-indent: 12px;
-}
-body[data-variant="d"] .q {
-  font-size: 24px;
-  line-height: 2;
-  letter-spacing: 0;
-}
-body[data-variant="d"] .card.back {
-  background-image: none;
-  background-color: var(--paper-lo);
-}
-body[data-variant="d"] .intro-title { font-size: 36px; letter-spacing: 0; }
-body[data-variant="d"] .intro-byline { font-size: 12px; letter-spacing: 0; }
-body[data-variant="d"] .intro-epigraph { font-size: 24px; letter-spacing: 0; line-height: 2; }
-body[data-variant="d"] .intro-rule { width: 24px; height: 2px; background: var(--ink-70); }
-body[data-variant="d"] .mode-btn, body[data-variant="d"] .next-btn {
-  font-size: 12px;
-  letter-spacing: 6px;
-  text-indent: 6px;
-  border-width: 2px;
-  padding: 12px 18px;
-}
-body[data-variant="d"] .progress { font-size: 12px; letter-spacing: 0; }
-
-/* ── reduced motion: keep fades, drop movement ── */
 @media (prefers-reduced-motion: reduce) {
   .rise { animation-duration: .01s; animation-delay: 0s; }
+  .card, .back, #intro { transition-duration: .01s !important; }
 }
 </style>
 </head>
 <body>
 
-<nav class="variant-switch"><!-- TEMP: gallery picker, deleted after checkpoint A -->
-  <button data-v="a" class="on">A</button>
-  <button data-v="b">B</button>
-  <button data-v="c">C</button>
-  <button data-v="d">D</button>
-</nav>
-
-<main id="intro" class="screen">
+<main id="intro">
   <h1 class="intro-title rise d1">《對手》</h1>
   <p class="intro-byline rise d2">這是根據《無用之用 Master of None》的作者在意的事寫成的牌組。</p>
   <div class="intro-rule rise d3"></div>
@@ -358,84 +325,327 @@ body[data-variant="d"] .progress { font-size: 12px; letter-spacing: 0; }
   </div>
 </main>
 
-<main id="stage" class="screen hidden">
-  <div class="card" id="the-card">
-    <div class="act-label" id="act-label"></div>
-    <div class="q" id="q-text"></div>
-  </div>
-  <button class="next-btn" id="next">下一張</button>
-</main>
+<div class="stage">
+  <div class="card hidden" id="cardA"><div class="act-label"></div><div class="q"></div></div>
+  <div class="card hidden" id="cardB"><div class="act-label"></div><div class="q"></div></div>
+</div>
 
+<div class="table"><div class="origin" id="origin"></div></div>
+
+<button class="next-btn hidden" id="next">下一張</button>
 <div class="progress hidden" id="progress"></div>
+<button class="replay" id="replay">再洗一次</button>
 
 <script>
 'use strict';
 //__DECK_JS__
 
-/* ── Phase 2 TEMP preview wiring ──
-   Cycles a few representative cards (long / short / blank / final / back)
-   so typography can be judged. Replaced by the real state machine in
-   Phase 3. */
 (() => {
-  const samples = [
-    { act: ACT_RECOGNITION, text: RECOGNITION_CARDS[4] }, // long, two sentences
-    { act: ACT_PRICE, text: PRICE_CARDS[1] },             // short, no ending punct
-    { act: ACT_RIVAL, text: RIVAL_CARDS[3] },
-    { act: ACT_BLANK, text: BLANK_CARD },
-    { act: ACT_FINAL, text: FINAL_CARD },                 // final: no act label
-    { back: true },                                       // card back
-  ];
-  let i = 0;
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (id) => document.getElementById(id);
+  const origin = $('origin');
+  const progressEl = $('progress');
+  const nextBtn = $('next');
 
-  const intro = document.getElementById('intro');
-  const stage = document.getElementById('stage');
-  const card = document.getElementById('the-card');
-  const actLabel = document.getElementById('act-label');
-  const qText = document.getElementById('q-text');
-  const progress = document.getElementById('progress');
+  // ── state ──
+  let deck = [];        // 25 cards, final last
+  let ptr = 0;          // next card to reveal
+  let mode = null;
+  let piles = [];       // acts mode: [{act, els: [back...], labelEl}]
+  let fanEls = [];      // backs currently in the fan
+  let finalEl = null;   // the final card's back
+  let stagedIs = 'A';
+  let busy = false;
+  let lastAdvance = 0;
 
-  function render() {
-    const s = samples[i];
-    card.classList.toggle('back', !!s.back);
-    actLabel.textContent = s.back || s.act === ACT_FINAL ? '' : s.act;
-    qText.textContent = s.back ? '' : s.text;
-    progress.textContent = `${(i % 25) + 1}／25`;
+  const vw = () => window.innerWidth;
+  const instant = () => RM || document.body.classList.contains('instant');
+
+  // ── geometry ──
+  const setT = (el, x, y, r, s = 1) => {
+    el.style.transform = `translate(${x}px, ${-y}px) rotate(${r}deg) scale(${s})`;
+  };
+
+  function fanPositions(n) {
+    const R = Math.min(Math.max(vw() * 1.05, 360), 640);
+    const backH = Math.min(Math.max(88, window.innerHeight * .14), 124);
+    // keep edges on screen; in shuffle, also clear the final card's corner
+    const maxX = vw() / 2 - (backH / 1.5) * (mode === 'shuffle' ? 1.75 : .72);
+    const maxA = Math.asin(Math.min(1, maxX / R));
+    const per = n > 1 ? Math.min(6.5 * Math.PI / 180, (2 * maxA) / (n - 1)) : 0;
+    const edgeDrop = (1 - Math.cos(per * (n - 1) / 2)) * R;
+    return Array.from({ length: n }, (_, i) => {
+      const a = (i - (n - 1) / 2) * per;
+      // edges rest near the baseline; the arc's crown lifts gently
+      const y = edgeDrop - (1 - Math.cos(a)) * R + 18;
+      return { x: Math.sin(a) * R, y, r: (a * 180) / Math.PI };
+    });
   }
 
+  const jitter = (i) => ((i * 7919) % 5) - 2; // deterministic tiny rotation
+
+  function makeBack() {
+    const el = document.createElement('div');
+    el.className = 'back';
+    origin.appendChild(el);
+    return el;
+  }
+
+  // ── table setup ──
+  const PILE_GAP = () => Math.min(vw() * .24, 118);
+
+  function pileX(k, nPiles) { return (k - (nPiles - 1) / 2) * PILE_GAP(); }
+  function finalX(nPiles) { return pileX(nPiles - 1, nPiles) + PILE_GAP() * .12; }
+
+  function buildTable() {
+    origin.innerHTML = '';
+    piles = []; fanEls = [];
+    const counts = { [ACT_RECOGNITION]: 0, [ACT_RIVAL]: 0, [ACT_PRICE]: 0 };
+    deck.slice(0, 24).forEach((c, i) => {
+      const act = c.act === ACT_BLANK ? blankActOf(deck, i) : c.act;
+      counts[act]++;
+    });
+
+    if (mode === 'acts') {
+      const acts = [ACT_RECOGNITION, ACT_RIVAL, ACT_PRICE];
+      acts.forEach((act, k) => {
+        const els = Array.from({ length: counts[act] }, (_, j) => {
+          const el = makeBack();
+          setT(el, pileX(k, 4) + j * .5, j * .6, jitter(j + k * 3));
+          el.classList.add('dim');
+          el.dataset.pile = k;
+          el.addEventListener('click', () => onPileTap(k));
+          return el;
+        });
+        const label = document.createElement('div');
+        label.className = 'pile-label dim';
+        label.textContent = act;
+        label.style.left = `${pileX(k, 4)}px`;
+        origin.appendChild(label);
+        piles.push({ act, els, labelEl: label, opened: false });
+      });
+      placeFinal(finalX(4));
+    } else {
+      // shuffle: one big pile, fans open immediately
+      fanEls = deck.slice(0, 24).map((_, j) => {
+        const el = makeBack();
+        setT(el, j * .4, j * .45, jitter(j));
+        el.addEventListener('click', () => onBackTap(el));
+        return el;
+      });
+      placeFinal(vw() / 2 - Math.min(Math.max(88, window.innerHeight * .14), 124) / 1.5 * .78);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        openFan();
+      }));
+    }
+  }
+
+  function placeFinal(x) {
+    finalEl = makeBack();
+    finalEl.classList.add('dim');
+    setT(finalEl, x, 4, 2.5);
+    finalEl.addEventListener('click', onFinalTap);
+  }
+
+  // ── fan choreography ──
+  function openFan() {
+    const pos = fanPositions(fanEls.length);
+    fanEls.forEach((el, i) => {
+      el.style.transitionDelay = instant() ? '0s' : `${i * 26}ms`;
+      el.style.zIndex = 2;
+      setT(el, pos[i].x, pos[i].y, pos[i].r);
+      el.classList.remove('dim');
+    });
+    setTimeout(() => fanEls.forEach((el) => (el.style.transitionDelay = '0s')),
+      fanEls.length * 26 + 60);
+  }
+
+  function refan() {
+    const pos = fanPositions(fanEls.length);
+    fanEls.forEach((el, i) => setT(el, pos[i].x, pos[i].y, pos[i].r));
+  }
+
+  function onPileTap(k) {
+    const pile = piles[k];
+    if (busy || pile.opened || !pileIsCurrent(k)) return;
+    pile.opened = true;
+    pile.labelEl.classList.add('dim');
+    setTimeout(() => pile.labelEl.style.opacity = 0, 200);
+    fanEls = pile.els;
+    fanEls.forEach((el) => {
+      el.removeEventListener('click', el._pileTap);
+      el.addEventListener('click', () => onBackTap(el));
+    });
+    openFan();
+  }
+
+  function pileIsCurrent(k) {
+    return piles.slice(0, k).every((p) => p.opened && p.els.every((e) => !e.isConnected))
+      && !piles[k].opened;
+  }
+
+  function updateLights() {
+    if (mode !== 'acts') { lightFinalIfDone(); return; }
+    const k = piles.findIndex((p) => !p.opened);
+    if (k >= 0 && pileIsCurrent(k)) {
+      piles[k].els.forEach((el) => el.classList.remove('dim'));
+      piles[k].labelEl.classList.remove('dim');
+    }
+    lightFinalIfDone();
+  }
+
+  function lightFinalIfDone() {
+    const questionsLeft = fanEls.some((e) => e.isConnected)
+      || (mode === 'acts' && piles.some((p) => !p.opened));
+    if (!questionsLeft && finalEl) finalEl.classList.remove('dim');
+  }
+
+  // ── drawing ──
+  function onBackTap(el) {
+    if (busy || !el.isConnected || el.classList.contains('dim')) return;
+    drawFrom(el);
+  }
+
+  function advance() {
+    const now = Date.now();
+    if (busy || now - lastAdvance < 380) return;
+    const live = fanEls.filter((e) => e.isConnected && !e.classList.contains('dim'));
+    if (live.length) { drawFrom(live[Math.floor(live.length / 2)]); return; }
+    if (mode === 'acts') {
+      const k = piles.findIndex((p) => !p.opened);
+      if (k >= 0 && pileIsCurrent(k)) { onPileTap(k); return; }
+    }
+    if (finalEl && !finalEl.classList.contains('dim')) onFinalTap();
+  }
+
+  function drawFrom(el, slow = false) {
+    busy = true;
+    lastAdvance = Date.now();
+    const card = deck[ptr++];
+
+    // the tapped back flies up toward the stage and dissolves
+    const or = origin.getBoundingClientRect();
+    const rise = or.top - window.innerHeight * .31; // positive px, upward
+    el.classList.add('flying');
+    el.style.transform = `translate(0px, ${-rise}px) rotate(0deg) scale(1.9)`;
+
+    fanEls = fanEls.filter((e) => e !== el);
+    setTimeout(() => { el.remove(); refan(); }, instant() ? 0 : 300);
+
+    showCard(card, slow);
+
+    setTimeout(() => {
+      busy = false;
+      updateLights();
+      if (card.act === ACT_FINAL) endGame();
+    }, instant() ? 30 : (slow ? 950 : 520));
+  }
+
+  function onFinalTap() {
+    if (busy || !finalEl || finalEl.classList.contains('dim')) return;
+    const el = finalEl;
+    finalEl = null;
+    nextBtn.classList.add('hidden');
+    drawFrom(el, true);
+  }
+
+  // ── stage ──
+  function showCard(card, slow) {
+    const cur = $(`card${stagedIs}`);
+    stagedIs = stagedIs === 'A' ? 'B' : 'A';
+    const nxt = $(`card${stagedIs}`);
+
+    if (cur.classList.contains('enter')) {
+      cur.classList.remove('enter');
+      cur.classList.add('exit');
+      setTimeout(() => { cur.classList.add('hidden'); cur.classList.remove('exit'); }, instant() ? 0 : 420);
+    } else {
+      cur.classList.add('hidden');
+    }
+
+    nxt.querySelector('.act-label').textContent = card.act === ACT_FINAL ? '' : card.act;
+    nxt.querySelector('.q').textContent = card.text;
+    nxt.classList.remove('hidden', 'exit', 'enter', 'slow');
+    if (slow) nxt.classList.add('slow');
+    // start slightly below + smaller, as if rising from the table
+    nxt.style.transform = 'translateY(7svh) scale(.9)';
+    nxt.style.opacity = '0';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      nxt.style.transform = ''; nxt.style.opacity = '';
+      nxt.classList.add('enter');
+    }));
+
+    progressEl.textContent = `${ptr}／${deck.length}`;
+    progressEl.classList.remove('hidden');
+    if (ptr < 24) nextBtn.classList.remove('hidden');
+  }
+
+  function endGame() {
+    nextBtn.classList.add('hidden');
+    setTimeout(() => $('replay').classList.add('show'), RM ? 100 : 1400);
+  }
+
+  // ── inputs ──
   document.querySelectorAll('.mode-btn').forEach((b) =>
     b.addEventListener('click', () => {
-      intro.classList.add('hidden');
-      stage.classList.remove('hidden');
-      progress.classList.remove('hidden');
-      render();
+      if (mode) return;
+      mode = b.dataset.mode;
+      deck = buildDeck(mode);
+      $('intro').classList.add('leave');
+      setTimeout(() => $('intro').classList.add('hidden'), 500);
+      buildTable();
+      if (mode === 'acts') setTimeout(updateLights, RM ? 0 : 450);
     })
   );
 
-  document.getElementById('next').addEventListener('click', () => {
-    i = (i + 1) % samples.length;
-    render();
+  ['cardA', 'cardB'].forEach((id) => {
+    const el = $(id);
+    el.addEventListener('click', advance);
+    // swipe left to advance
+    let x0 = null, y0 = null;
+    el.addEventListener('touchstart', (e) => {
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    }, { passive: true });
+    el.addEventListener('touchend', (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      const dy = e.changedTouches[0].clientY - y0;
+      if (dx < -42 && Math.abs(dy) < Math.abs(dx)) advance();
+      x0 = y0 = null;
+    }, { passive: true });
   });
 
-  // TEMP variant gallery picker (checkpoint A).
-  document.querySelectorAll('.variant-switch button').forEach((b) =>
-    b.addEventListener('click', () => {
-      document.body.dataset.variant = b.dataset.v;
-      document.querySelectorAll('.variant-switch button').forEach((x) => x.classList.toggle('on', x === b));
-    })
-  );
+  nextBtn.addEventListener('click', advance);
+  $('replay').addEventListener('click', () => location.reload());
 
-  // TEMP screenshot hooks: #shot-N jumps to sample N (no entrance anim);
-  // an optional -vb / -vc suffix selects a gallery variant.
-  const mv = location.hash.match(/-v([abcd])/);
-  if (mv) document.body.dataset.variant = mv[1];
-  const m = location.hash.match(/#shot-(\d+)/);
-  if (m) {
-    document.querySelectorAll('.rise').forEach((el) => { el.style.animation = 'none'; el.style.opacity = 1; });
-    i = Math.min(Number(m[1]), samples.length - 1);
-    intro.classList.add('hidden');
-    stage.classList.remove('hidden');
-    progress.classList.remove('hidden');
-    render();
+  window.addEventListener('resize', () => { if (fanEls.length) refan(); });
+
+  // ── TEMP screenshot hooks（#shot-table / #shot-fan / #shot-staged / #shot-shuffle / #shot-end）──
+  const shot = location.hash.match(/^#shot-(\w+)$/);
+  if (shot) {
+    document.body.classList.add('instant');
+    const go = (m) => {
+      mode = m; deck = buildDeck(m);
+      $('intro').classList.add('hidden');
+      buildTable();
+      updateLights();
+    };
+    const step = shot[1];
+    if (step === 'table') go('acts');
+    if (step === 'fan') { go('acts'); onPileTap(0); }
+    if (step === 'staged') { go('acts'); onPileTap(0); drawFrom(fanEls[3]); }
+    if (step === 'shuffle') go('shuffle');
+    if (step === 'end') {
+      // cheat straight to the final card: table cleared, only 終卡 staged
+      go('acts');
+      origin.innerHTML = '';
+      piles = []; fanEls = []; finalEl = null;
+      ptr = 25;
+      showCard(deck[24], true);
+      nextBtn.classList.add('hidden');
+      endGame();
+    }
+    setTimeout(() => document.body.classList.remove('instant'), 400);
   }
 })();
 </script>

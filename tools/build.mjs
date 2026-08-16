@@ -15,7 +15,6 @@ const deck = readFileSync(p('src/deck.js'), 'utf8').replace(/^export /gm, '');
 let fontCss = '';
 const faces = [
   ['build/font.b64', 'Rivalry Mono'],
-  ['build/font-pixel.b64', 'Rivalry Pixel'],
 ];
 for (const [file, family] of faces) {
   if (!existsSync(p(file))) {
