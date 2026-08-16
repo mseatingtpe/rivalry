@@ -199,6 +199,8 @@ body.instant *, body.instant *::before, body.instant *::after {
   letter-spacing: .09em;
   color: var(--pale-90);
   text-align: center;
+  text-wrap: balance;   /* centered lines break evenly */
+  line-break: strict;   /* no leading punctuation */
 }
 
 /* enter / exit choreography — spring-flavored */
@@ -305,19 +307,67 @@ body.instant *, body.instant *::before, body.instant *::after {
 }
 .disc-back.pop { transform: translateY(-9px); opacity: 0; }
 
-/* ── review overlay（翻閱棄牌，唯讀）── */
+/* ── review overlay（棄牌總覽，唯讀、一次展開）── */
 .review {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(9, 9, 12, .93);
+  background: rgba(9, 9, 12, .94);
   opacity: 0;
   pointer-events: none;
   transition: opacity .35s ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding: max(5svh, env(safe-area-inset-top)) 1.1rem max(7svh, env(safe-area-inset-bottom));
 }
 .review.open { opacity: 1; pointer-events: auto; }
-.review .card { opacity: 1; cursor: pointer; transition: opacity .22s ease, transform .22s ease; }
-.review .card.swap { opacity: 0; transform: translateY(6px); }
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: .9rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+@media (min-width: 700px) { .review-grid { grid-template-columns: repeat(3, 1fr); max-width: 660px; } }
+.mini {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border: 1px solid var(--pale-40);
+  background-image: linear-gradient(180deg, var(--face-hi) 0%, var(--face) 58%, var(--face-lo) 100%);
+  display: flex;
+  align-items: center;
+  padding: calc(6px + 1rem) calc(6px + .7rem);
+  opacity: 0;
+  animation: rise .5s cubic-bezier(.22,.61,.36,1) both;
+}
+.mini::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--pale-12);
+  pointer-events: none;
+}
+.mini .act-label {
+  position: absolute;
+  top: calc(6px + .55rem);
+  left: 0; right: 0;
+  text-align: center;
+  font-size: .5rem;
+  letter-spacing: .42em;
+  text-indent: .42em;
+  color: var(--pale-40);
+}
+.mini .q {
+  width: 100%;
+  font-size: .64rem;
+  line-height: 2;
+  letter-spacing: .05em;
+  text-align: center;
+  text-wrap: balance;
+  line-break: strict;
+  color: var(--pale-90);
+}
 
 /* ── chrome ── */
 .progress {
@@ -397,9 +447,7 @@ body.instant *, body.instant *::before, body.instant *::after {
 <div class="table"><div class="origin" id="origin"></div></div>
 
 <div class="discard empty" id="discard"></div>
-<div class="review" id="review">
-  <div class="card" id="cardR"><div class="act-label"></div><div class="q"></div></div>
-</div>
+<div class="review" id="review"></div>
 
 <button class="next-btn hidden" id="next">下一張</button>
 <div class="progress hidden" id="progress"></div>
@@ -538,7 +586,37 @@ function blankActOf(deck, blankIndex) {
 
   const vw = () => window.innerWidth;
   const instant = () => RM || document.body.classList.contains('instant');
-  const buzz = (ms) => { try { navigator.vibrate && navigator.vibrate(ms); } catch {} };
+  const buzz = (pattern) => { try { navigator.vibrate && navigator.vibrate(pattern); } catch {} };
+
+  // ── sound: synthesized paper whispers, no external files ──
+  let AC = null, noiseBuf = null;
+  function initAudio() {
+    if (AC) { AC.resume && AC.resume(); return; }
+    try {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      noiseBuf = AC.createBuffer(1, AC.sampleRate, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    } catch {}
+  }
+  function swish(dur, vol, freq, delay = 0) {
+    if (!AC || AC.state !== 'running') return;
+    const t = AC.currentTime + delay;
+    const src = AC.createBufferSource();
+    src.buffer = noiseBuf;
+    src.playbackRate.value = .9 + Math.random() * .2;
+    const f = AC.createBiquadFilter();
+    f.type = 'bandpass';
+    f.Q.value = .8;
+    f.frequency.setValueAtTime(freq, t);
+    f.frequency.exponentialRampToValueAtTime(freq * .5, t + dur);
+    const g = AC.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + dur * .25);
+    g.gain.exponentialRampToValueAtTime(.0008, t + dur);
+    src.connect(f); f.connect(g); g.connect(AC.destination);
+    src.start(t, Math.random() * .5, dur + .05);
+  }
 
   // ── geometry ──
   const setT = (el, x, y, r, s = 1) => {
@@ -657,7 +735,8 @@ function blankActOf(deck, blankIndex) {
     });
     setTimeout(() => fanEls.forEach((el) => (el.style.transitionDelay = '0s')),
       fanEls.length * 26 + 60);
-    buzz(12);
+    buzz(25);
+    for (let i = 0; i < 3; i++) swish(.08, .045, 1900, i * .06);
   }
 
   function refan() {
@@ -703,7 +782,8 @@ function blankActOf(deck, blankIndex) {
       finalEl.style.transitionDuration = instant() ? '' : '1.2s, 1.6s';
       finalEl.classList.remove('dim');
       setTimeout(() => { if (finalEl) finalEl.style.transitionDuration = ''; }, 1700);
-      buzz(15);
+      buzz(30);
+      swish(.4, .05, 700);
     }
   }
 
@@ -729,7 +809,8 @@ function blankActOf(deck, blankIndex) {
     busy = true;
     lastAdvance = Date.now();
     const card = deck[ptr++];
-    buzz(slow ? 20 : 8);
+    buzz(slow ? [30, 60, 30] : 18);
+    swish(slow ? .5 : .12, slow ? .07 : .09, slow ? 900 : 1500);
 
     // the tapped back flies up toward the stage and dissolves
     const or = origin.getBoundingClientRect();
@@ -789,11 +870,9 @@ function blankActOf(deck, blankIndex) {
     updateDiscard();
   }
 
-  // ── discard pile + read-only review（進程仍只能往前）──
+  // ── discard pile + read-only overview（一次展開，進程仍只能往前）──
   const discardEl = $('discard');
   const reviewEl = $('review');
-  const cardR = $('cardR');
-  let rIdx = 0;
 
   const history = () => deck.slice(0, Math.max(0, ptr - 1));
 
@@ -814,45 +893,33 @@ function blankActOf(deck, blankIndex) {
     }
   }
 
-  function renderReview() {
+  function openReview() {
     const h = history();
-    const c = h[h.length - 1 - rIdx]; // rIdx 0 = most recent
-    cardR.querySelector('.act-label').textContent = c.act === ACT_FINAL ? '' : c.act;
-    cardR.querySelector('.q').textContent = c.text;
-  }
-
-  function reviewNav(dir) { // +1 = older, -1 = newer
-    const h = history();
-    const next = Math.min(Math.max(rIdx + dir, 0), h.length - 1);
-    if (next === rIdx) return;
-    rIdx = next;
-    cardR.classList.add('swap');
-    setTimeout(() => { renderReview(); cardR.classList.remove('swap'); }, instant() ? 0 : 200);
-  }
-
-  discardEl.addEventListener('click', () => {
-    if (!history().length) return;
-    rIdx = 0; // most recent first
-    renderReview();
+    if (!h.length) return;
+    reviewEl.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'review-grid';
+    h.forEach((c, i) => { // chronological: the game's record
+      const m = document.createElement('div');
+      m.className = 'mini';
+      m.style.animationDelay = instant() ? '0s' : `${i * 35}ms`;
+      const a = document.createElement('div');
+      a.className = 'act-label';
+      a.textContent = c.act === ACT_FINAL ? '' : c.act;
+      const q = document.createElement('div');
+      q.className = 'q';
+      q.textContent = c.text;
+      m.append(a, q);
+      grid.appendChild(m);
+    });
+    reviewEl.appendChild(grid);
     reviewEl.classList.add('open');
-  });
-  reviewEl.addEventListener('click', (e) => {
-    if (e.target === reviewEl) reviewEl.classList.remove('open');
-  });
-  cardR.addEventListener('click', () => reviewNav(1));
-  {
-    let rx = null, ry = null;
-    cardR.addEventListener('touchstart', (e) => {
-      rx = e.touches[0].clientX; ry = e.touches[0].clientY;
-    }, { passive: true });
-    cardR.addEventListener('touchend', (e) => {
-      if (rx === null) return;
-      const dx = e.changedTouches[0].clientX - rx;
-      const dy = e.changedTouches[0].clientY - ry;
-      if (Math.abs(dx) > 42 && Math.abs(dx) > Math.abs(dy)) reviewNav(dx < 0 ? 1 : -1);
-      rx = ry = null;
-    }, { passive: true });
   }
+
+  discardEl.addEventListener('click', openReview);
+  reviewEl.addEventListener('click', (e) => {
+    if (!e.target.closest('.mini')) reviewEl.classList.remove('open');
+  });
 
   function endGame() {
     nextBtn.classList.add('hidden');
@@ -863,6 +930,7 @@ function blankActOf(deck, blankIndex) {
   document.querySelectorAll('.mode-btn').forEach((b) =>
     b.addEventListener('click', () => {
       if (mode) return;
+      initAudio(); // must start inside a user gesture
       mode = b.dataset.mode;
       deck = buildDeck(mode);
       $('intro').classList.add('leave');
@@ -924,8 +992,8 @@ function blankActOf(deck, blankIndex) {
     if (step === 'shuffle') go('shuffle');
     if (step === 'review') {
       go('acts'); onPileTap(0);
-      for (let k = 0; k < 3; k++) { drawFrom(fanEls[0]); busy = false; }
-      rIdx = 0; renderReview(); reviewEl.classList.add('open');
+      for (let k = 0; k < 5; k++) { drawFrom(fanEls[0]); busy = false; }
+      openReview();
     }
     if (step === 'end') {
       // cheat straight to the final card: table cleared, only 終卡 staged
