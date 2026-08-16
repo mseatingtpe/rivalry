@@ -1,26 +1,70 @@
 # PROGRESS
 
 > 規格看 [SPEC.md](./SPEC.md)。**每個 Phase 做完停下來給 Sunny 看**，不要一路做到底。
+> Phase 2 / 3 內另設視覺與動態確認點（★），Sunny 點頭才繼續。
 
-## Phase 0 — 骨架
+## Phase 0 — 骨架與規格
 
-**狀態：進行中**
+**狀態：完成待驗收**
 
 - [x] `~/dev/personal/rivalry` + `git init`（main，author `Sunny Cheng <ms.eatingtpe@gmail.com>`）
 - [x] SPEC.md / PROGRESS.md / CLAUDE.md / README.md
 - [x] `.gitignore`
-- [ ] **Sunny 決定**：這專案是什麼（填 SPEC 的「這是什麼」與核心機制）
-- [ ] **Sunny 決定**：技術選型（語言 / 儲存 / 部署）
-- [ ] 依選型跑 scaffold（`create-next-app` / `npm init` / 其他）
-- [ ] GitHub private repo `mseatingtpe/rivalry` + `git remote add origin`
-- [ ] 第一次 `git push -u origin main`
+- [x] **Sunny 已拍板**：這專案是《對手》互動卡牌網頁（SPEC 已填完整規格與逐字卡片內容）
+- [x] **Sunny 已拍板**：技術選型（單一 HTML + vanilla JS／Source Han Mono TC 內嵌／GitHub Pages public）
+- [ ] GitHub public repo `mseatingtpe/rivalry` + `git remote add origin`（移到 Phase 5 一起做）
 
-## Phase 1 —（待定義）
+## Phase 1 — 牌組邏輯 + 排序驗證
 
-未開始。
+**狀態：未開始**
+
+- [ ] `src/deck.js`：24 張卡片逐字內容 + `buildDeck('acts'|'shuffle')`
+- [ ] `tools/verify-deck.mjs`：SPEC 驗收條件跑 1000 次
+- [ ] 驗收：`node tools/verify-deck.mjs` 全綠
+
+## Phase 2 — 靜態版面與卡片視覺
+
+**狀態：未開始**
+
+- [ ] 開場畫面（標題→署名→細線→題詞→兩顆按鈕，依序淡入上浮）
+- [ ] 卡片 2:3 直式、雙層框、紙紋、單色調（先用系統 mono 頂著）
+- [ ] ★ **確認點 A**：LAN preview 給 Sunny 看開場 + 靜態卡視覺，過了才進 Phase 3
+
+## Phase 3 — 揭幕互動
+
+**狀態：未開始**
+
+- [ ] ★ **確認點 B**：攤弧／抽牌／離場三個動態 demo 先給 Sunny 定調
+- [ ] 完整狀態機：三疊亮起→攤弧→儀式性抽牌→補位→換幕→終卡→再洗一次
+- [ ] 亂序模式（一次攤成長弧）
+- [ ] 前進四路、380ms 節流、reduced-motion、iOS 細節
+- [ ] ★ **確認點 C**：手機完整跑完兩模式各一局，Sunny 驗收
+
+## Phase 4 — 字型子集內嵌 + build
+
+**狀態：未開始**
+
+- [ ] `tools/subset-font.sh`：下載 Source Han Mono TC → pyftsubset → woff2
+- [ ] `tools/build.mjs`：注入字型 base64 + deck.js → root `index.html`
+- [ ] 驗收：`file://` 開啟單檔，Network 零外部請求
+
+## Phase 5 — 上線
+
+**狀態：未開始**
+
+- [ ] `gh repo create mseatingtpe/rivalry --public` + push
+- [ ] Pages：Deploy from a branch（`main` / root）
+- [ ] 驗收：Pages URL 手機跑完整一局
 
 ## 決策日誌
 
 | 日期 | 決定 | 原因 |
 |------|------|------|
 | 2026-08-16 | 專案落在 `~/dev/personal/`，走個人 GitHub 帳號 `mseatingtpe` | 個人專案，與公務身份（`taiccasunny`）分流 |
+| 2026-08-16 | 專案定為《對手》互動卡牌網頁，完整規格入 SPEC | Sunny 提供完整重建 prompt |
+| 2026-08-16 | 技術棧：單一 HTML + vanilla JS，不用 React | 零依賴零外部請求，25 張牌的狀態機不需要 framework；產物單檔可丟任何靜態空間 |
+| 2026-08-16 | 字型改 Source Han Mono TC（推翻原稿 Noto Serif TC） | Sunny 拍板要 mono、電腦感。OFL 可內嵌；系統 Songti 是 Apple 授權字型不可嵌公開網頁 |
+| 2026-08-16 | Repo 改 public（推翻原本 private） | GitHub Pages 免費版只能從 public repo 發佈 |
+| 2026-08-16 | Pages 用 Deploy from a branch，不走 GitHub Actions | `mseatingtpe` 的 gh token 沒有 `workflow` scope，推 workflow 檔會被擋 |
+| 2026-08-16 | 留白牌實作：在 23 張題目的 24 個空隙均勻隨機插入，歸屬看其後第一張題目的幕 | 規格「洗入任意位置」與「幕不被切斷」並存的合理詮釋——歸幕規則本就為留白落在幕中間而設 |
+| 2026-08-16 | 牌組邏輯抽成 `src/deck.js`，build 時 inline 回單檔 | 驗證腳本要能 import；卡片文字只留一份實作端 SSOT |
