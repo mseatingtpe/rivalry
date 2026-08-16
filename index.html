@@ -13,23 +13,24 @@
 
 
 /* ── tokens ─────────────────────────────────────────────
-   Night ink. Single hue: one pale tone over deep ink desk;
-   every secondary is the same pale at reduced alpha. */
+   Ma:Sonic 參照：冷灰白紙、近黑打字機墨、Klein blue 唯一 accent。
+   Every secondary tone is the same ink at reduced alpha. */
 :root {
-  --desk-hi: #1c1c21;
-  --desk:    #141417;
-  --desk-lo: #0d0d10;
-  --face-hi: #202026;
-  --face:    #1a1a1f;
-  --face-lo: #16161a;
-  --back-hi: #18181d;
-  --back-lo: #121216;
-  --pale:    #e6e5e1;
-  --pale-90: rgba(230, 229, 225, .90);
-  --pale-55: rgba(230, 229, 225, .55);
-  --pale-40: rgba(230, 229, 225, .40);
-  --pale-25: rgba(230, 229, 225, .25);
-  --pale-12: rgba(230, 229, 225, .12);
+  --paper-hi: #f1f0ea;
+  --paper:    #eae8e1;
+  --paper-lo: #dcdad1;
+  --face-hi: #f6f5f0;
+  --face:    #efeee8;
+  --face-lo: #e6e4db;
+  --back-hi: #e3e1d8;
+  --back-lo: #d7d4c9;
+  --ink:     #1b1b1a;
+  --ink-90: rgba(27, 27, 26, .90);
+  --ink-55: rgba(27, 27, 26, .55);
+  --ink-40: rgba(27, 27, 26, .40);
+  --ink-25: rgba(27, 27, 26, .25);
+  --ink-12: rgba(27, 27, 26, .12);
+  --blue:   #2528e0; /* the one loud thing */
   --mono: "Rivalry Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --card-h: min(46svh, 108vw);          /* staged card */
   --back-h: clamp(88px, 14svh, 124px);  /* table card backs */
@@ -41,10 +42,10 @@ html, body { height: 100%; }
 
 body {
   font-family: var(--mono);
-  color: var(--pale-90);
-  background-color: var(--desk);
+  color: var(--ink-90);
+  background-color: var(--paper);
   background-image: radial-gradient(130% 90% at 50% -10%,
-    var(--desk-hi) 0%, var(--desk) 55%, var(--desk-lo) 100%);
+    var(--paper-hi) 0%, var(--paper) 55%, var(--paper-lo) 100%);
   background-attachment: fixed;
   min-height: 100vh;
   min-height: 100dvh;
@@ -62,10 +63,10 @@ body::before {
   z-index: 0;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(120% 90% at 50% 30%, transparent 30%, rgba(5, 5, 8, .55) 100%);
   transition: opacity 1.8s ease;
 }
 body.endgame::before { opacity: 1; }
+body::before { background: radial-gradient(120% 90% at 50% 30%, transparent 30%, rgba(27, 27, 26, .14) 100%); }
 
 /* paper grain — inline turbulence, never blocks touches */
 body::after {
@@ -106,21 +107,21 @@ body.instant *, body.instant *::before, body.instant *::after {
   font-size: clamp(2rem, 9vw, 2.9rem);
   font-weight: 500;
   letter-spacing: .06em;
-  color: var(--pale);
+  color: var(--ink);
 }
 .intro-byline {
   margin-top: 1.4rem;
   font-size: .66rem;
   letter-spacing: .1em;
-  color: var(--pale-40);
+  color: var(--ink-40);
 }
-.intro-rule { width: 26px; height: 1px; background: var(--pale-40); margin: 3.2rem 0; }
+.intro-rule { width: 26px; height: 2px; background: var(--blue); margin: 3.2rem 0; }
 .intro-epigraph {
   font-size: clamp(.98rem, 4.2vw, 1.12rem);
   line-height: 2.3;
   letter-spacing: .08em;
   margin: 0 0 3.6rem;
-  color: var(--pale-90);
+  color: var(--ink-90);
 }
 .intro-modes { display: flex; gap: 1.6rem; }
 .mode-btn {
@@ -128,15 +129,15 @@ body.instant *, body.instant *::before, body.instant *::after {
   font-size: .92rem;
   letter-spacing: .38em;
   text-indent: .38em;
-  color: var(--pale-90);
+  color: var(--ink-90);
   background: transparent;
-  border: 1px solid var(--pale-55);
+  border: 1px solid var(--ink-55);
   padding: .78em 1.5em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background-color .25s ease, color .25s ease;
 }
-.mode-btn:active { background: var(--pale); color: var(--desk); }
+.mode-btn:active { background: var(--blue); border-color: var(--blue); color: var(--paper-hi); }
 
 .rise { opacity: 0; animation: rise 1s cubic-bezier(.22,.61,.36,1) forwards; }
 @keyframes rise {
@@ -162,7 +163,7 @@ body.instant *, body.instant *::before, body.instant *::after {
   margin: auto;
   height: var(--card-h);
   width: calc(var(--card-h) / 1.5);
-  border: 1px solid var(--pale-55);
+  border: 1px solid var(--ink);
   background-image: linear-gradient(180deg, var(--face-hi) 0%, var(--face) 58%, var(--face-lo) 100%);
   display: flex;
   align-items: center;
@@ -179,7 +180,7 @@ body.instant *, body.instant *::before, body.instant *::after {
   content: "";
   position: absolute;
   inset: 9px;
-  border: 1px solid var(--pale-25);
+  border: 1px solid var(--ink-25);
   pointer-events: none;
 }
 .card .act-label {
@@ -190,14 +191,14 @@ body.instant *, body.instant *::before, body.instant *::after {
   font-size: .62rem;
   letter-spacing: .62em;
   text-indent: .62em;
-  color: var(--pale-40);
+  color: var(--blue);
 }
 .card .q {
   width: 100%;
   font-size: clamp(.95rem, 2.3svh, 1.1rem);
   line-height: 2.25;
   letter-spacing: .09em;
-  color: var(--pale-90);
+  color: var(--ink-90);
   text-align: center;
   text-wrap: balance;   /* centered lines break evenly */
   line-break: strict;   /* no leading punctuation */
@@ -223,7 +224,7 @@ body.instant *, body.instant *::before, body.instant *::after {
   position: fixed;
   left: 0; right: 0; bottom: 0;
   height: 38svh;
-  pointer-events: none;
+  pointer-events: auto; /* receives finger-graze across the fan */
 }
 .origin { /* fan / pile coordinate origin: bottom center */
   position: absolute;
@@ -237,7 +238,7 @@ body.instant *, body.instant *::before, body.instant *::after {
   width: calc(var(--back-h) / 1.5);
   left: calc(var(--back-h) / -3);  /* center on origin */
   bottom: 0;
-  border: 1px solid var(--pale-40);
+  border: 1px solid var(--ink-40);
   background-image: linear-gradient(180deg, var(--back-hi), var(--back-lo));
   pointer-events: auto;
   cursor: pointer;
@@ -251,10 +252,11 @@ body.instant *, body.instant *::before, body.instant *::after {
   content: "";
   position: absolute;
   inset: 5px;
-  border: 1px solid var(--pale-25);
+  border: 1px solid var(--ink-25);
   pointer-events: none;
 }
 .back.dim { opacity: .28; pointer-events: none; }
+.back.graze { transition-duration: .16s, .3s; } /* quick lift under the finger */
 .back.flying {
   opacity: 0;
   transition:
@@ -270,11 +272,11 @@ body.instant *, body.instant *::before, body.instant *::after {
   font-size: .58rem;
   letter-spacing: .4em;
   text-indent: .4em;
-  color: var(--pale-40);
+  color: var(--blue); /* the lit act wears the accent */
   white-space: nowrap;
-  transition: opacity .45s ease;
+  transition: opacity .45s ease, color .45s ease;
 }
-.pile-label.dim { opacity: .3; }
+.pile-label.dim { opacity: .45; color: var(--ink-40); }
 
 /* ── discard pile（左緣，抽過的牌）── */
 .discard {
@@ -294,7 +296,7 @@ body.instant *, body.instant *::before, body.instant *::after {
 .disc-back {
   position: absolute;
   inset: 0;
-  border: 1px solid var(--pale-25);
+  border: 1px solid var(--ink-25);
   background-image: linear-gradient(180deg, var(--back-hi), var(--back-lo));
   transition: transform .45s cubic-bezier(.3, 1.14, .42, 1), opacity .4s ease;
 }
@@ -302,7 +304,7 @@ body.instant *, body.instant *::before, body.instant *::after {
   content: "";
   position: absolute;
   inset: 4px;
-  border: 1px solid var(--pale-12);
+  border: 1px solid var(--ink-12);
   pointer-events: none;
 }
 .disc-back.pop { transform: translateY(-9px); opacity: 0; }
@@ -312,7 +314,7 @@ body.instant *, body.instant *::before, body.instant *::after {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(9, 9, 12, .94);
+  background: rgba(234, 232, 225, .96);
   opacity: 0;
   pointer-events: none;
   transition: opacity .35s ease;
@@ -333,7 +335,7 @@ body.instant *, body.instant *::before, body.instant *::after {
 .mini {
   position: relative;
   aspect-ratio: 2 / 3;
-  border: 1px solid var(--pale-40);
+  border: 1px solid var(--ink-40);
   background-image: linear-gradient(180deg, var(--face-hi) 0%, var(--face) 58%, var(--face-lo) 100%);
   display: flex;
   align-items: center;
@@ -345,7 +347,7 @@ body.instant *, body.instant *::before, body.instant *::after {
   content: "";
   position: absolute;
   inset: 6px;
-  border: 1px solid var(--pale-12);
+  border: 1px solid var(--ink-12);
   pointer-events: none;
 }
 .mini .act-label {
@@ -356,7 +358,7 @@ body.instant *, body.instant *::before, body.instant *::after {
   font-size: .5rem;
   letter-spacing: .42em;
   text-indent: .42em;
-  color: var(--pale-40);
+  color: var(--blue);
 }
 .mini .q {
   width: 100%;
@@ -366,7 +368,7 @@ body.instant *, body.instant *::before, body.instant *::after {
   text-align: center;
   text-wrap: balance;
   line-break: strict;
-  color: var(--pale-90);
+  color: var(--ink-90);
 }
 
 /* ── chrome ── */
@@ -376,8 +378,18 @@ body.instant *, body.instant *::before, body.instant *::after {
   bottom: max(.9rem, env(safe-area-inset-bottom));
   font-size: .62rem;
   letter-spacing: .12em;
-  color: var(--pale-40);
+  color: var(--ink-55);
   z-index: 4;
+}
+.progress::before { /* one blue dot, Ma:Sonic 的簽名 */
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  margin-right: .55em;
+  vertical-align: 1px;
 }
 .next-btn {
   position: fixed;
@@ -388,16 +400,16 @@ body.instant *, body.instant *::before, body.instant *::after {
   font-size: .68rem;
   letter-spacing: .3em;
   text-indent: .3em;
-  color: var(--pale-55);
+  color: var(--ink-55);
   background: transparent;
-  border: 1px solid var(--pale-25);
+  border: 1px solid var(--ink-25);
   padding: .6em 1.3em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   z-index: 4;
   transition: opacity .4s ease;
 }
-.next-btn:active { background: var(--pale); color: var(--desk); }
+.next-btn:active { background: var(--blue); border-color: var(--blue); color: var(--paper-hi); }
 .replay {
   position: fixed;
   left: 50%;
@@ -407,10 +419,10 @@ body.instant *, body.instant *::before, body.instant *::after {
   font-size: .72rem;
   letter-spacing: .3em;
   text-indent: .3em;
-  color: var(--pale-55);
+  color: var(--ink-55);
   background: none;
   border: none;
-  border-bottom: 1px solid var(--pale-25);
+  border-bottom: 1px solid var(--blue);
   padding: .4em .2em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -620,6 +632,7 @@ function blankActOf(deck, blankIndex) {
 
   // ── geometry ──
   const setT = (el, x, y, r, s = 1) => {
+    el._pos = { x, y, r, s };
     el.style.transform = `translate(${x}px, ${-y}px) rotate(${r}deg) scale(${s})`;
   };
 
@@ -956,6 +969,48 @@ function blankActOf(deck, blankIndex) {
       x0 = y0 = null;
     }, { passive: true });
   });
+
+  // ── finger graze across the fan: the card under the finger rises ──
+  let grazeEl = null;
+  function raise(el, on) {
+    const p = el._pos;
+    if (!p) return;
+    el.classList.add('graze');
+    el.style.zIndex = on ? 5 : 2;
+    el.style.transform = `translate(${p.x}px, ${-(p.y + (on ? 16 : 0))}px) rotate(${p.r}deg)`;
+    if (!on) setTimeout(() => el.classList.remove('graze'), 320);
+  }
+  function grazeMove(x, y) {
+    const hit = document.elementFromPoint(x, y);
+    const back = hit && hit.closest ? hit.closest('.back') : null;
+    const t = back && fanEls.includes(back) && !back.classList.contains('dim')
+      && !back.classList.contains('flying') ? back : null;
+    if (t === grazeEl) return;
+    if (grazeEl) raise(grazeEl, false);
+    grazeEl = t;
+    if (t) { raise(t, true); buzz(8); swish(.05, .028, 2300); }
+  }
+  const tableEl = document.querySelector('.table');
+  tableEl.addEventListener('touchstart', (e) => grazeMove(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  tableEl.addEventListener('touchmove', (e) => grazeMove(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  tableEl.addEventListener('touchend', () => {
+    if (!grazeEl) return;
+    const el = grazeEl;
+    grazeEl = null;
+    raise(el, false);
+    onBackTap(el); // release draws the risen card
+  });
+  tableEl.addEventListener('touchcancel', () => {
+    if (grazeEl) { raise(grazeEl, false); grazeEl = null; }
+  });
+  if (matchMedia('(hover: hover)').matches) {
+    tableEl.addEventListener('pointermove', (e) => {
+      if (e.pointerType === 'mouse') grazeMove(e.clientX, e.clientY);
+    });
+    tableEl.addEventListener('pointerleave', () => {
+      if (grazeEl) { raise(grazeEl, false); grazeEl = null; }
+    });
+  }
 
   nextBtn.addEventListener('click', advance);
   $('replay').addEventListener('click', () => location.reload());
