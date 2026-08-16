@@ -2,6 +2,10 @@
 
 **《對手》— 一副給兩個人面對面玩的問答卡牌網頁，沒有輸贏。** 單一 HTML 檔、零外部請求，部署在 GitHub Pages。作者署名為電子報《無用之用 Master of None》。
 
+### ▸ [mseatingtpe.github.io/rivalry](https://mseatingtpe.github.io/rivalry/)
+
+手機直式優先。24 張題目牌 + 1 張終卡，兩種模式：照三幕（辨識 → 對手 → 代價）、亂序。
+
 ## 文件
 
 | 檔案 | 內容 |

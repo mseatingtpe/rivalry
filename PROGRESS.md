@@ -51,11 +51,18 @@
 
 ## Phase 5 — 上線
 
-**狀態：未開始**
+**狀態：完成**
 
-- [ ] `gh repo create mseatingtpe/rivalry --public` + push
-- [ ] Pages：Deploy from a branch（`main` / root）
-- [ ] 驗收：Pages URL 手機跑完整一局
+- [x] `gh repo create mseatingtpe/rivalry --public` + push（remote 走 SSH alias `github.com-personal`）
+- [x] Pages：Deploy from a branch（`main` / root），build `built`
+- [x] 驗收：https://mseatingtpe.github.io/rivalry/ 回 HTTP 200、內容為最新版
+
+**線上網址：https://mseatingtpe.github.io/rivalry/**
+
+## 待辦（下一輪）
+
+- [ ] 英文譯稿逐張校對（`src/deck.js` 的 `*_EN`，目前是 Claude 起草）
+- [ ] 之後加牌：改 `src/deck.js` → `bash tools/rebuild.sh` → commit & push
 
 ## 決策日誌
 
