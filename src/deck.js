@@ -42,25 +42,62 @@ export const PRICE_CARDS = [
   '說一件你已經原諒、但沒說出口的事。',
 ];
 
-export const BLANK_CARD = '跳過這輪。話語以外的空白，不一定需要被填滿。';
+export const BLANK_CARD = '乾杯！'; // 2026-08-16 Sunny amended (was 跳過這輪…)
 
 export const FINAL_CARD = '我們不可能真正理解另外一個人。所以，約下一次。';
 
+// ── English companions（DRAFT — Sunny 校對中；index-aligned with the
+// arrays above. The final card stays Chinese-only by decision.）──
+export const RECOGNITION_EN = [
+  'Your favorite book, right at this moment.',
+  'If you could travel to any time and place, which concert would you see?',
+  'A recent moment you loved.',
+  'Without mentioning your job or title, how would you introduce yourself?',
+  "Something you've recently changed your mind about. What you thought then, what you think now.",
+  "What 'useless' thing — in other people's eyes — do you love?",
+  "Do you have a private fondness that most people wouldn't understand?",
+  'The last time you felt truly seen — describe the scene.',
+  'Which childhood moment shaped who you are now?',
+  'Tell of a moment you decided to trust someone. What did you see?',
+  'Something you love, but chose not to own.',
+  'The last time you lied — what were you protecting?',
+];
+
+export const RIVAL_EN = [
+  'What could a friend say about you that would make you happiest?',
+  'Ask me a question you suspect no one has ever asked me.',
+  'Where do you think I misunderstand you the most?',
+  "Count to three, then answer together: one ability of the other's you envy.",
+  'Describe our current relationship with one term from your profession.',
+];
+
+export const PRICE_EN = [
+  'When did you last feel you had no talent?',
+  'Something you would throw yourself into, no matter the cost.',
+  "The highest price you've ever paid for love.",
+  'How do you assume people will let you down?',
+  "What part of me exists because I've known you?",
+  "Something you've already forgiven, but never said aloud.",
+];
+
+export const BLANK_EN = 'Cheers!';
+
 // ── deck building ──
 
-const makeCards = (act, texts) => texts.map((text) => ({ act, text }));
+const makeCards = (act, texts, ens) =>
+  texts.map((text, i) => ({ act, text, en: ens[i] }));
 
 /** The 23 question cards in canonical three-act order (no blank, no final). */
 function orderedQuestions() {
   return [
-    ...makeCards(ACT_RECOGNITION, RECOGNITION_CARDS),
-    ...makeCards(ACT_RIVAL, RIVAL_CARDS),
-    ...makeCards(ACT_PRICE, PRICE_CARDS),
+    ...makeCards(ACT_RECOGNITION, RECOGNITION_CARDS, RECOGNITION_EN),
+    ...makeCards(ACT_RIVAL, RIVAL_CARDS, RIVAL_EN),
+    ...makeCards(ACT_PRICE, PRICE_CARDS, PRICE_EN),
   ];
 }
 
-const blankCard = () => ({ act: ACT_BLANK, text: BLANK_CARD });
-const finalCard = () => ({ act: ACT_FINAL, text: FINAL_CARD });
+const blankCard = () => ({ act: ACT_BLANK, text: BLANK_CARD, en: BLANK_EN });
+const finalCard = () => ({ act: ACT_FINAL, text: FINAL_CARD }); // Chinese-only
 
 /** Uniform in-place Fisher–Yates shuffle. */
 function shuffle(arr) {

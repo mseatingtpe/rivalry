@@ -201,6 +201,15 @@ body.instant *, body.instant *::before, body.instant *::after {
   text-wrap: balance;   /* centered lines break evenly */
   line-break: strict;   /* no leading punctuation */
 }
+.q .q-en {
+  margin-top: 1.6em;
+  font-size: .66em;
+  line-height: 1.85;
+  letter-spacing: .05em;
+  color: var(--ink-55);
+  text-wrap: balance;
+}
+.q .q-en:empty { display: none; }
 
 /* enter / exit choreography — spring-flavored */
 .card.enter {
@@ -358,6 +367,7 @@ body.instant *, body.instant *::before, body.instant *::after {
   text-indent: .42em;
   color: var(--blue);
 }
+.mini .q-en { font-size: .82em; margin-top: 1em; }
 .mini .q {
   width: 100%;
   font-size: .64rem;
@@ -450,8 +460,8 @@ body.instant *, body.instant *::before, body.instant *::after {
 </main>
 
 <div class="stage">
-  <div class="card hidden" id="cardA"><div class="act-label"></div><div class="q"></div></div>
-  <div class="card hidden" id="cardB"><div class="act-label"></div><div class="q"></div></div>
+  <div class="card hidden" id="cardA"><div class="act-label"></div><div class="q"><div class="q-zh"></div><div class="q-en"></div></div></div>
+  <div class="card hidden" id="cardB"><div class="act-label"></div><div class="q"><div class="q-zh"></div><div class="q-en"></div></div></div>
 </div>
 
 <div class="table"><div class="origin" id="origin"></div></div>
@@ -755,7 +765,8 @@ body.instant *, body.instant *::before, body.instant *::after {
     }
 
     nxt.querySelector('.act-label').textContent = card.act === ACT_FINAL ? '' : card.act;
-    nxt.querySelector('.q').textContent = card.text;
+    nxt.querySelector('.q-zh').textContent = card.text;
+    nxt.querySelector('.q-en').textContent = card.en || '';
     nxt.classList.remove('hidden', 'exit', 'enter', 'slow');
     if (slow) nxt.classList.add('slow');
     // start slightly below + smaller, as if rising from the table
@@ -810,7 +821,13 @@ body.instant *, body.instant *::before, body.instant *::after {
       a.textContent = c.act === ACT_FINAL ? '' : c.act;
       const q = document.createElement('div');
       q.className = 'q';
-      q.textContent = c.text;
+      const zh = document.createElement('div');
+      zh.className = 'q-zh';
+      zh.textContent = c.text;
+      const en = document.createElement('div');
+      en.className = 'q-en';
+      en.textContent = c.en || '';
+      q.append(zh, en);
       m.append(a, q);
       grid.appendChild(m);
     });
