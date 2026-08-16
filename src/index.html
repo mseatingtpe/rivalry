@@ -49,6 +49,19 @@ body {
   touch-action: manipulation;
 }
 
+/* endgame breath: the desk deepens when only the final card remains */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(120% 90% at 50% 30%, transparent 30%, rgba(5, 5, 8, .55) 100%);
+  transition: opacity 1.8s ease;
+}
+body.endgame::before { opacity: 1; }
+
 /* paper grain — inline turbulence, never blocks touches */
 body::after {
   content: "";
@@ -180,12 +193,13 @@ body.instant *, body.instant *::before, body.instant *::after {
   line-height: 2.25;
   letter-spacing: .09em;
   color: var(--pale-90);
+  text-align: center;
 }
 
 /* enter / exit choreography — spring-flavored */
 .card.enter {
   opacity: 1;
-  transform: none;
+  transform: rotate(var(--tilt, 0deg)); /* desktop pointer micro-tilt */
   transition:
     transform .62s cubic-bezier(.3, 1.18, .4, 1),
     opacity .5s ease;
@@ -410,6 +424,7 @@ body.instant *, body.instant *::before, body.instant *::after {
 
   const vw = () => window.innerWidth;
   const instant = () => RM || document.body.classList.contains('instant');
+  const buzz = (ms) => { try { navigator.vibrate && navigator.vibrate(ms); } catch {} };
 
   // ── geometry ──
   const setT = (el, x, y, r, s = 1) => {
@@ -447,6 +462,23 @@ body.instant *, body.instant *::before, body.instant *::after {
   function pileX(k, nPiles) { return (k - (nPiles - 1) / 2) * PILE_GAP(); }
   function finalX(nPiles) { return pileX(nPiles - 1, nPiles) + PILE_GAP() * .12; }
 
+  // stagger the table pieces settling into place（就位）
+  function settle(el, delay) {
+    const target = el.style.transform;
+    el._settleCancel = false;
+    el.style.transition = 'none';
+    el.style.transform = `${target} translateY(60px)`;
+    el.style.opacity = '0';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.style.transition = '';
+      el.style.opacity = '';
+      if (el._settleCancel) return; // a fan/draw already re-aimed this card
+      el.style.transitionDelay = instant() ? '0s' : `${delay}ms`;
+      el.style.transform = target;
+      setTimeout(() => (el.style.transitionDelay = '0s'), delay + 700);
+    }));
+  }
+
   function buildTable() {
     origin.innerHTML = '';
     piles = []; fanEls = [];
@@ -465,6 +497,7 @@ body.instant *, body.instant *::before, body.instant *::after {
           el.classList.add('dim');
           el.dataset.pile = k;
           el.addEventListener('click', () => onPileTap(k));
+          settle(el, 120 + k * 130 + j * 12);
           return el;
         });
         const label = document.createElement('div');
@@ -495,12 +528,14 @@ body.instant *, body.instant *::before, body.instant *::after {
     finalEl.classList.add('dim');
     setT(finalEl, x, 4, 2.5);
     finalEl.addEventListener('click', onFinalTap);
+    settle(finalEl, mode === 'acts' ? 620 : 380);
   }
 
   // ── fan choreography ──
   function openFan() {
     const pos = fanPositions(fanEls.length);
     fanEls.forEach((el, i) => {
+      el._settleCancel = true;
       el.style.transitionDelay = instant() ? '0s' : `${i * 26}ms`;
       el.style.zIndex = 2;
       setT(el, pos[i].x, pos[i].y, pos[i].r);
@@ -508,6 +543,7 @@ body.instant *, body.instant *::before, body.instant *::after {
     });
     setTimeout(() => fanEls.forEach((el) => (el.style.transitionDelay = '0s')),
       fanEls.length * 26 + 60);
+    buzz(12);
   }
 
   function refan() {
@@ -547,7 +583,14 @@ body.instant *, body.instant *::before, body.instant *::after {
   function lightFinalIfDone() {
     const questionsLeft = fanEls.some((e) => e.isConnected)
       || (mode === 'acts' && piles.some((p) => !p.opened));
-    if (!questionsLeft && finalEl) finalEl.classList.remove('dim');
+    if (!questionsLeft && finalEl && finalEl.classList.contains('dim')) {
+      // ceremony: the desk deepens, the final card brightens slowly
+      document.body.classList.add('endgame');
+      finalEl.style.transitionDuration = instant() ? '' : '1.2s, 1.6s';
+      finalEl.classList.remove('dim');
+      setTimeout(() => { if (finalEl) finalEl.style.transitionDuration = ''; }, 1700);
+      buzz(15);
+    }
   }
 
   // ── drawing ──
@@ -572,6 +615,7 @@ body.instant *, body.instant *::before, body.instant *::after {
     busy = true;
     lastAdvance = Date.now();
     const card = deck[ptr++];
+    buzz(slow ? 20 : 8);
 
     // the tapped back flies up toward the stage and dissolves
     const or = origin.getBoundingClientRect();
@@ -733,6 +777,19 @@ body.instant *, body.instant *::before, body.instant *::after {
 
   nextBtn.addEventListener('click', advance);
   $('replay').addEventListener('click', () => location.reload());
+
+  // desktop-only micro-tilt on the staged card
+  if (matchMedia('(hover: hover)').matches && !RM) {
+    ['cardA', 'cardB'].forEach((id) => {
+      const el = $(id);
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const dx = (e.clientX - r.left) / r.width - .5;
+        el.style.setProperty('--tilt', `${(dx * 2.4).toFixed(2)}deg`);
+      });
+      el.addEventListener('pointerleave', () => el.style.setProperty('--tilt', '0deg'));
+    });
+  }
 
   window.addEventListener('resize', () => { if (fanEls.length) refan(); });
 
