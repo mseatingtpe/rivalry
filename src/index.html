@@ -286,6 +286,52 @@ body[data-variant="c"] .q { letter-spacing: .13em; }
 body[data-variant="c"] .mode-btn, body[data-variant="c"] .next-btn { border-style: dashed; }
 body[data-variant="c"] .intro-title { letter-spacing: .14em; text-indent: .14em; }
 
+/* ── D 像素：點陣字型、平塗、2px 格、疏點 dither ── */
+body[data-variant="d"] {
+  --mono: "Rivalry Pixel", ui-monospace, monospace;
+  --paper: #f0ebdd;
+  --paper-hi: #f4f0e3;
+  --paper-lo: #e2dbc6;
+  background-image: none; /* flat: pixels don't do soft light */
+  -webkit-font-smoothing: none;
+}
+body[data-variant="d"]::after { /* sparse pixel dither instead of turbulence */
+  opacity: .5;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><g fill="%23221d12" opacity="0.07"><rect x="2" y="1" width="1" height="1"/><rect x="9" y="4" width="1" height="1"/><rect x="5" y="8" width="1" height="1"/><rect x="11" y="10" width="1" height="1"/></g></svg>');
+}
+body[data-variant="d"] .card {
+  background-image: none;
+  background-color: var(--paper-hi);
+  border-width: 2px;
+}
+body[data-variant="d"] .card::before { inset: 8px; border-width: 2px; }
+body[data-variant="d"] .card .act-label {
+  font-size: 12px;
+  letter-spacing: 12px;
+  text-indent: 12px;
+}
+body[data-variant="d"] .q {
+  font-size: 24px;
+  line-height: 2;
+  letter-spacing: 0;
+}
+body[data-variant="d"] .card.back {
+  background-image: none;
+  background-color: var(--paper-lo);
+}
+body[data-variant="d"] .intro-title { font-size: 36px; letter-spacing: 0; }
+body[data-variant="d"] .intro-byline { font-size: 12px; letter-spacing: 0; }
+body[data-variant="d"] .intro-epigraph { font-size: 24px; letter-spacing: 0; line-height: 2; }
+body[data-variant="d"] .intro-rule { width: 24px; height: 2px; background: var(--ink-70); }
+body[data-variant="d"] .mode-btn, body[data-variant="d"] .next-btn {
+  font-size: 12px;
+  letter-spacing: 6px;
+  text-indent: 6px;
+  border-width: 2px;
+  padding: 12px 18px;
+}
+body[data-variant="d"] .progress { font-size: 12px; letter-spacing: 0; }
+
 /* ── reduced motion: keep fades, drop movement ── */
 @media (prefers-reduced-motion: reduce) {
   .rise { animation-duration: .01s; animation-delay: 0s; }
@@ -298,6 +344,7 @@ body[data-variant="c"] .intro-title { letter-spacing: .14em; text-indent: .14em;
   <button data-v="a" class="on">A</button>
   <button data-v="b">B</button>
   <button data-v="c">C</button>
+  <button data-v="d">D</button>
 </nav>
 
 <main id="intro" class="screen">
@@ -379,7 +426,7 @@ body[data-variant="c"] .intro-title { letter-spacing: .14em; text-indent: .14em;
 
   // TEMP screenshot hooks: #shot-N jumps to sample N (no entrance anim);
   // an optional -vb / -vc suffix selects a gallery variant.
-  const mv = location.hash.match(/-v([abc])/);
+  const mv = location.hash.match(/-v([abcd])/);
   if (mv) document.body.dataset.variant = mv[1];
   const m = location.hash.match(/#shot-(\d+)/);
   if (m) {

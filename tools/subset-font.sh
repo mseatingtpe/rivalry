@@ -37,3 +37,22 @@ python3 -m fontTools.subset "$FONT_OTF" \
 
 base64 -i build/rivalry-mono.woff2 | tr -d '\n' > build/font.b64
 echo "✓ build/font.b64 ($(du -h build/rivalry-mono.woff2 | cut -f1) woff2)"
+
+# ── pixel variant: Fusion Pixel 12px monospaced zh_hant (OFL) ──
+PIXEL_TTF="build/fusion-pixel/fusion-pixel-12px-monospaced-zh_hant.ttf"
+if [ ! -f "$PIXEL_TTF" ]; then
+  echo "downloading Fusion Pixel Font (OFL)…"
+  gh release download 2026.08.11 -R TakWolf/fusion-pixel-font \
+    -p "fusion-pixel-font-12px-monospaced-ttf-v2026.08.11.zip" -D build --clobber
+  unzip -o -q build/fusion-pixel-font-12px-monospaced-ttf-v2026.08.11.zip -d build/fusion-pixel
+fi
+
+python3 -m fontTools.subset "$PIXEL_TTF" \
+  --text-file=build/subset-chars.txt \
+  --flavor=woff2 \
+  --layout-features='*' \
+  --no-hinting \
+  --output-file=build/rivalry-pixel.woff2
+
+base64 -i build/rivalry-pixel.woff2 | tr -d '\n' > build/font-pixel.b64
+echo "✓ build/font-pixel.b64 ($(du -h build/rivalry-pixel.woff2 | cut -f1) woff2)"

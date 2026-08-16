@@ -13,17 +13,23 @@ const html = readFileSync(p('src/index.html'), 'utf8');
 const deck = readFileSync(p('src/deck.js'), 'utf8').replace(/^export /gm, '');
 
 let fontCss = '';
-if (existsSync(p('build/font.b64'))) {
-  const b64 = readFileSync(p('build/font.b64'), 'utf8').trim();
-  fontCss = [
+const faces = [
+  ['build/font.b64', 'Rivalry Mono'],
+  ['build/font-pixel.b64', 'Rivalry Pixel'],
+];
+for (const [file, family] of faces) {
+  if (!existsSync(p(file))) {
+    console.warn(`${file} not found — "${family}" falls back to system fonts.`);
+    continue;
+  }
+  const b64 = readFileSync(p(file), 'utf8').trim();
+  fontCss += [
     '@font-face {',
-    '  font-family: "Rivalry Mono";',
+    `  font-family: "${family}";`,
     `  src: url(data:font/woff2;base64,${b64}) format("woff2");`,
     '  font-display: block;',
-    '}',
+    '}\n',
   ].join('\n');
-} else {
-  console.warn('build/font.b64 not found — building without embedded font (system mono fallback).');
 }
 
 const out = html
