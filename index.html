@@ -199,18 +199,24 @@ body.instant *, body.instant *::before, body.instant *::after {
 .card .q {
   width: 100%;
   font-size: clamp(.95rem, 2.3svh, 1.1rem);
-  line-height: 2.25;
-  letter-spacing: .09em;
   color: var(--ink-90);
   text-align: center;
-  text-wrap: balance;   /* centered lines break evenly */
-  line-break: strict;   /* no leading punctuation */
 }
+.q .q-zh {
+  line-height: 2.05;
+  letter-spacing: .04em;
+  line-break: strict;            /* no punctuation orphaned to line start */
+  text-spacing-trim: trim-start; /* tighten full-width punctuation */
+  text-wrap: balance;
+}
+/* Each clause is atomic: lines may only break at punctuation, never
+   mid-word. The <wbr> between clauses supplies the break opportunity. */
+.q .cl { display: inline-block; }
 .q .q-en {
-  margin-top: 1.6em;
-  font-size: .66em;
-  line-height: 1.85;
-  letter-spacing: .05em;
+  margin-top: 1.5em;
+  font-size: .62em;
+  line-height: 1.8;
+  letter-spacing: .02em;
   color: var(--ink-55);
   text-wrap: balance;
 }
@@ -530,36 +536,38 @@ const FINAL_CARD = '我們不可能真正理解另外一個人。所以，約下
 
 // ── English companions（DRAFT — Sunny 校對中；index-aligned with the
 // arrays above. The final card stays Chinese-only by decision.）──
+// Terse on purpose. Cards whose Chinese carries no ending punctuation get
+// no closing period in English either — they stay fragments, as written.
 const RECOGNITION_EN = [
-  'Your favorite book, right at this moment.',
-  'If you could travel to any time and place, which concert would you see?',
-  'A recent moment you loved.',
-  'Without mentioning your job or title, how would you introduce yourself?',
-  "Something you've recently changed your mind about. What you thought then, what you think now.",
-  "What 'useless' thing — in other people's eyes — do you love?",
-  "Do you have a private fondness that most people wouldn't understand?",
-  'The last time you felt truly seen — describe the scene.',
-  'Which childhood moment shaped who you are now?',
-  'Tell of a moment you decided to trust someone. What did you see?',
-  'Something you love, but chose not to own.',
-  'The last time you lied — what were you protecting?',
+  'The book you love right now',
+  'Any time, any place — whose concert do you go to?',
+  'A moment you have loved lately',
+  'Without your job or your title: introduce yourself.',
+  'Something you changed your mind about. What you thought then. What you think now.',
+  'What do you love that others call useless?',
+  'Do you have a private fondness no one else quite gets?',
+  'The last time you felt seen. Describe the room.',
+  'Which childhood moment made you this?',
+  'A moment you decided to trust someone. What did you see?',
+  'Something you love and chose not to own.',
+  'Your last lie — what were you protecting?',
 ];
 
 const RIVAL_EN = [
-  'What could a friend say about you that would make you happiest?',
-  'Ask me a question you suspect no one has ever asked me.',
-  'Where do you think I misunderstand you the most?',
-  "Count to three, then answer together: one ability of the other's you envy.",
-  'Describe our current relationship with one term from your profession.',
+  'What a friend could say about you that would make you glad',
+  'Ask me something you think no one has asked me.',
+  'Where do I misunderstand you most?',
+  'Count to three. Both answer: one thing the other can do that you envy.',
+  'One word from your profession for what we are right now.',
 ];
 
 const PRICE_EN = [
   'When did you last feel you had no talent?',
-  'Something you would throw yourself into, no matter the cost.',
-  "The highest price you've ever paid for love.",
-  'How do you assume people will let you down?',
-  "What part of me exists because I've known you?",
-  "Something you've already forgiven, but never said aloud.",
+  'What you would throw yourself into',
+  'The most expensive thing love has cost you',
+  'How do you expect people to disappoint you?',
+  'What part of me grew because I met you?',
+  'Something you have forgiven and never said aloud.',
 ];
 
 const BLANK_EN = 'Cheers!';
@@ -649,6 +657,28 @@ function blankActOf(deck, blankIndex) {
   const vw = () => window.innerWidth;
   const instant = () => RM || document.body.classList.contains('instant');
   const buzz = (pattern) => { try { navigator.vibrate && navigator.vibrate(pattern); } catch {} };
+
+  // ── CJK line breaking: split into clauses at full-width punctuation and
+  // make each clause atomic, so a line never breaks inside a word. ──
+  const CLAUSE_END = '，。、？！；：';
+  function setZh(el, text) {
+    el.textContent = '';
+    let buf = '';
+    const flush = () => {
+      if (!buf) return;
+      const span = document.createElement('span');
+      span.className = 'cl';
+      span.textContent = buf;
+      el.appendChild(span);
+      el.appendChild(document.createElement('wbr'));
+      buf = '';
+    };
+    for (const ch of text) {
+      buf += ch;
+      if (CLAUSE_END.includes(ch)) flush();
+    }
+    flush();
+  }
 
   // ── sound: synthesized paper whispers, no external files ──
   let AC = null, noiseBuf = null;
@@ -916,7 +946,7 @@ function blankActOf(deck, blankIndex) {
     }
 
     nxt.querySelector('.act-label').textContent = card.act === ACT_FINAL ? '' : card.act;
-    nxt.querySelector('.q-zh').textContent = card.text;
+    setZh(nxt.querySelector('.q-zh'), card.text);
     nxt.querySelector('.q-en').textContent = card.en || '';
     nxt.classList.remove('hidden', 'exit', 'enter', 'slow');
     if (slow) nxt.classList.add('slow');
@@ -974,7 +1004,7 @@ function blankActOf(deck, blankIndex) {
       q.className = 'q';
       const zh = document.createElement('div');
       zh.className = 'q-zh';
-      zh.textContent = c.text;
+      setZh(zh, c.text);
       const en = document.createElement('div');
       en.className = 'q-en';
       en.textContent = c.en || '';

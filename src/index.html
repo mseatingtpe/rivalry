@@ -194,18 +194,24 @@ body.instant *, body.instant *::before, body.instant *::after {
 .card .q {
   width: 100%;
   font-size: clamp(.95rem, 2.3svh, 1.1rem);
-  line-height: 2.25;
-  letter-spacing: .09em;
   color: var(--ink-90);
   text-align: center;
-  text-wrap: balance;   /* centered lines break evenly */
-  line-break: strict;   /* no leading punctuation */
 }
+.q .q-zh {
+  line-height: 2.05;
+  letter-spacing: .04em;
+  line-break: strict;            /* no punctuation orphaned to line start */
+  text-spacing-trim: trim-start; /* tighten full-width punctuation */
+  text-wrap: balance;
+}
+/* Each clause is atomic: lines may only break at punctuation, never
+   mid-word. The <wbr> between clauses supplies the break opportunity. */
+.q .cl { display: inline-block; }
 .q .q-en {
-  margin-top: 1.6em;
-  font-size: .66em;
-  line-height: 1.85;
-  letter-spacing: .05em;
+  margin-top: 1.5em;
+  font-size: .62em;
+  line-height: 1.8;
+  letter-spacing: .02em;
   color: var(--ink-55);
   text-wrap: balance;
 }
@@ -499,6 +505,28 @@ body.instant *, body.instant *::before, body.instant *::after {
   const instant = () => RM || document.body.classList.contains('instant');
   const buzz = (pattern) => { try { navigator.vibrate && navigator.vibrate(pattern); } catch {} };
 
+  // ── CJK line breaking: split into clauses at full-width punctuation and
+  // make each clause atomic, so a line never breaks inside a word. ──
+  const CLAUSE_END = '，。、？！；：';
+  function setZh(el, text) {
+    el.textContent = '';
+    let buf = '';
+    const flush = () => {
+      if (!buf) return;
+      const span = document.createElement('span');
+      span.className = 'cl';
+      span.textContent = buf;
+      el.appendChild(span);
+      el.appendChild(document.createElement('wbr'));
+      buf = '';
+    };
+    for (const ch of text) {
+      buf += ch;
+      if (CLAUSE_END.includes(ch)) flush();
+    }
+    flush();
+  }
+
   // ── sound: synthesized paper whispers, no external files ──
   let AC = null, noiseBuf = null;
   function initAudio() {
@@ -765,7 +793,7 @@ body.instant *, body.instant *::before, body.instant *::after {
     }
 
     nxt.querySelector('.act-label').textContent = card.act === ACT_FINAL ? '' : card.act;
-    nxt.querySelector('.q-zh').textContent = card.text;
+    setZh(nxt.querySelector('.q-zh'), card.text);
     nxt.querySelector('.q-en').textContent = card.en || '';
     nxt.classList.remove('hidden', 'exit', 'enter', 'slow');
     if (slow) nxt.classList.add('slow');
@@ -823,7 +851,7 @@ body.instant *, body.instant *::before, body.instant *::after {
       q.className = 'q';
       const zh = document.createElement('div');
       zh.className = 'q-zh';
-      zh.textContent = c.text;
+      setZh(zh, c.text);
       const en = document.createElement('div');
       en.className = 'q-en';
       en.textContent = c.en || '';

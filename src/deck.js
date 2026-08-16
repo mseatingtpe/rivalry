@@ -48,36 +48,38 @@ export const FINAL_CARD = '我們不可能真正理解另外一個人。所以�
 
 // ── English companions（DRAFT — Sunny 校對中；index-aligned with the
 // arrays above. The final card stays Chinese-only by decision.）──
+// Terse on purpose. Cards whose Chinese carries no ending punctuation get
+// no closing period in English either — they stay fragments, as written.
 export const RECOGNITION_EN = [
-  'Your favorite book, right at this moment.',
-  'If you could travel to any time and place, which concert would you see?',
-  'A recent moment you loved.',
-  'Without mentioning your job or title, how would you introduce yourself?',
-  "Something you've recently changed your mind about. What you thought then, what you think now.",
-  "What 'useless' thing — in other people's eyes — do you love?",
-  "Do you have a private fondness that most people wouldn't understand?",
-  'The last time you felt truly seen — describe the scene.',
-  'Which childhood moment shaped who you are now?',
-  'Tell of a moment you decided to trust someone. What did you see?',
-  'Something you love, but chose not to own.',
-  'The last time you lied — what were you protecting?',
+  'The book you love right now',
+  'Any time, any place — whose concert do you go to?',
+  'A moment you have loved lately',
+  'Without your job or your title: introduce yourself.',
+  'Something you changed your mind about. What you thought then. What you think now.',
+  'What do you love that others call useless?',
+  'Do you have a private fondness no one else quite gets?',
+  'The last time you felt seen. Describe the room.',
+  'Which childhood moment made you this?',
+  'A moment you decided to trust someone. What did you see?',
+  'Something you love and chose not to own.',
+  'Your last lie — what were you protecting?',
 ];
 
 export const RIVAL_EN = [
-  'What could a friend say about you that would make you happiest?',
-  'Ask me a question you suspect no one has ever asked me.',
-  'Where do you think I misunderstand you the most?',
-  "Count to three, then answer together: one ability of the other's you envy.",
-  'Describe our current relationship with one term from your profession.',
+  'What a friend could say about you that would make you glad',
+  'Ask me something you think no one has asked me.',
+  'Where do I misunderstand you most?',
+  'Count to three. Both answer: one thing the other can do that you envy.',
+  'One word from your profession for what we are right now.',
 ];
 
 export const PRICE_EN = [
   'When did you last feel you had no talent?',
-  'Something you would throw yourself into, no matter the cost.',
-  "The highest price you've ever paid for love.",
-  'How do you assume people will let you down?',
-  "What part of me exists because I've known you?",
-  "Something you've already forgiven, but never said aloud.",
+  'What you would throw yourself into',
+  'The most expensive thing love has cost you',
+  'How do you expect people to disappoint you?',
+  'What part of me grew because I met you?',
+  'Something you have forgiven and never said aloud.',
 ];
 
 export const BLANK_EN = 'Cheers!';
