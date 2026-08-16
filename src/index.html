@@ -166,9 +166,9 @@ body::after {
 
 .card .q {
   width: 100%;
-  font-size: clamp(1rem, 2.55svh, 1.22rem);
-  line-height: 2.15;
-  letter-spacing: .06em;
+  font-size: clamp(.98rem, 2.4svh, 1.15rem);
+  line-height: 2.3;
+  letter-spacing: .09em;
   text-align: left;
 }
 
@@ -203,6 +203,89 @@ body::after {
   color: var(--ink-45);
 }
 
+/* ══ TEMP style gallery（checkpoint A）══
+   Three variants for Sunny to pick from; the losers get deleted.
+   A 鉛字印刷 = refined base below. B 老借書卡. C 終端機票券. */
+
+.variant-switch {
+  position: fixed;
+  top: max(.8rem, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 1.4rem;
+}
+.variant-switch button {
+  font-family: inherit;
+  font-size: .7rem;
+  letter-spacing: .1em;
+  color: var(--ink-45);
+  background: none;
+  border: none;
+  padding: .4em .6em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.variant-switch button.on { color: var(--ink); text-decoration: underline; text-underline-offset: .45em; }
+
+/* ── B 老借書卡：格線、戳章幕標、更深的墨 ── */
+body[data-variant="b"] {
+  --paper: #efe9d8;
+  --paper-hi: #f5f0e2;
+  --paper-lo: #e3dbc4;
+  --ink: #251f12;
+}
+body[data-variant="b"] .card::after { /* ruled lines, header area kept clear */
+  content: "";
+  position: absolute;
+  inset: calc(9px + 2.9rem) 9px 9px;
+  background-image: repeating-linear-gradient(to bottom,
+    rgba(37, 31, 18, .14) 0 1px, transparent 1px 2.5em);
+  pointer-events: none;
+}
+body[data-variant="b"] .card .act-label { /* stamp */
+  left: 50%;
+  right: auto;
+  top: calc(9px + .95rem);
+  transform: translateX(-50%) rotate(-2deg);
+  border: 1px solid var(--ink-45);
+  padding: .38em .55em .3em 1.1em;
+  letter-spacing: .55em;
+  text-indent: 0;
+  color: var(--ink-70);
+}
+body[data-variant="b"] .progress {
+  border: 1px solid var(--ink-28);
+  padding: .35em .6em .3em;
+}
+body[data-variant="b"] .intro-rule { height: 3px; border-top: 1px solid var(--ink-45); border-bottom: 1px solid var(--ink-45); background: none; }
+
+/* ── C 終端機票券：暗桌面、虛線、括號幕標 ── */
+body[data-variant="c"] {
+  --paper: #eee8d7;
+  --paper-hi: #f2ecdc;
+  --paper-lo: #d9cfb2;
+}
+body[data-variant="c"] { background-image: radial-gradient(130% 100% at 50% -8%, #ece5d1 0%, #e2d9c0 55%, #d3c8a6 100%); }
+body[data-variant="c"] .card {
+  background-image: linear-gradient(180deg, #f8f4e8 0%, #f3eddc 58%, #ece4cd 100%);
+}
+body[data-variant="c"] .card::before { border-style: dashed; }
+body[data-variant="c"] .card::after { /* ticket tear-off line above the foot */
+  content: "";
+  position: absolute;
+  left: 9px; right: 9px; bottom: calc(9px + 2.2rem);
+  border-top: 1px dashed var(--ink-28);
+  pointer-events: none;
+}
+body[data-variant="c"] .card .act-label::before { content: "［"; }
+body[data-variant="c"] .card .act-label::after { content: "］"; }
+body[data-variant="c"] .card .act-label { letter-spacing: .4em; text-indent: 0; }
+body[data-variant="c"] .q { letter-spacing: .13em; }
+body[data-variant="c"] .mode-btn, body[data-variant="c"] .next-btn { border-style: dashed; }
+body[data-variant="c"] .intro-title { letter-spacing: .14em; text-indent: .14em; }
+
 /* ── reduced motion: keep fades, drop movement ── */
 @media (prefers-reduced-motion: reduce) {
   .rise { animation-duration: .01s; animation-delay: 0s; }
@@ -210,6 +293,12 @@ body::after {
 </style>
 </head>
 <body>
+
+<nav class="variant-switch"><!-- TEMP: gallery picker, deleted after checkpoint A -->
+  <button data-v="a" class="on">A</button>
+  <button data-v="b">B</button>
+  <button data-v="c">C</button>
+</nav>
 
 <main id="intro" class="screen">
   <h1 class="intro-title rise d1">《對手》</h1>
@@ -280,8 +369,19 @@ body::after {
     render();
   });
 
-  // TEMP screenshot hook: #shot-N jumps straight to sample N, no entrance anim.
-  const m = location.hash.match(/^#shot-(\d+)$/);
+  // TEMP variant gallery picker (checkpoint A).
+  document.querySelectorAll('.variant-switch button').forEach((b) =>
+    b.addEventListener('click', () => {
+      document.body.dataset.variant = b.dataset.v;
+      document.querySelectorAll('.variant-switch button').forEach((x) => x.classList.toggle('on', x === b));
+    })
+  );
+
+  // TEMP screenshot hooks: #shot-N jumps to sample N (no entrance anim);
+  // an optional -vb / -vc suffix selects a gallery variant.
+  const mv = location.hash.match(/-v([abc])/);
+  if (mv) document.body.dataset.variant = mv[1];
+  const m = location.hash.match(/#shot-(\d+)/);
   if (m) {
     document.querySelectorAll('.rise').forEach((el) => { el.style.animation = 'none'; el.style.opacity = 1; });
     i = Math.min(Number(m[1]), samples.length - 1);
