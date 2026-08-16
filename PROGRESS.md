@@ -16,11 +16,12 @@
 
 ## Phase 1 — 牌組邏輯 + 排序驗證
 
-**狀態：未開始**
+**狀態：完成待驗收**
 
-- [ ] `src/deck.js`：24 張卡片逐字內容 + `buildDeck('acts'|'shuffle')`
-- [ ] `tools/verify-deck.mjs`：SPEC 驗收條件跑 1000 次
-- [ ] 驗收：`node tools/verify-deck.mjs` 全綠
+- [x] `src/deck.js`：24 張卡片逐字內容 + `buildDeck('acts'|'shuffle')` + `blankActOf()`
+- [x] `tools/verify-deck.mjs`：SPEC 驗收條件跑 1000 次 × 兩模式
+- [x] 驗收：`node tools/verify-deck.mjs` 全綠（留白 1000 次落遍 24/24 個空隙）
+- [x] 加驗：deck.js 25 句卡文與 SPEC.md 逐字比對一致
 
 ## Phase 2 — 靜態版面與卡片視覺
 
