@@ -68,15 +68,18 @@ body::before {
 body.endgame::before { opacity: 1; }
 body::before { background: radial-gradient(120% 90% at 50% 30%, transparent 30%, rgba(27, 27, 26, .14) 100%); }
 
-/* paper grain — inline turbulence, never blocks touches */
+/* paper material — three inline layers, never blocks touches:
+   1) fibre flecks（再生紙雜點） 2) fine tooth（紙牙） 3) pulp mottle（漿斑） */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 99;
   pointer-events: none;
-  opacity: .05;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="220" height="220" filter="url(%23n)"/></svg>');
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="420" height="420"><filter id="s"><feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="11" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0.11  0 0 0 0 0.11  0 0 0 0 0.10  0 0 2 0 -1.55"/></filter><rect width="420" height="420" filter="url(%23s)"/></svg>'),
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="220" height="220" filter="url(%23n)" opacity="0.04"/></svg>'),
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900"><filter id="m"><feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="3" seed="4" stitchTiles="stitch"/></filter><rect width="900" height="900" filter="url(%23m)" opacity="0.045"/></svg>');
 }
 
 .hidden { display: none !important; }
