@@ -59,6 +59,8 @@
 
 **線上網址：https://mseatingtpe.github.io/rivalry/**
 
+**簡報網址：https://mseatingtpe.github.io/rivalry/deck/**（Meetup 用，含實機 demo）
+
 ## 待辦（下一輪）
 
 - [ ] 英文譯稿逐張校對（`src/deck.js` 的 `*_EN`，目前是 Claude 起草）
@@ -88,3 +90,4 @@
 | 2026-08-16 | 開場改不對稱構圖＋漂浮藍點；標題拿掉《》改「對手＋藍線＋RIVALRY」（方案 C） | Sunny 選 C。《》移除後兩字太輕，需重新給份量；藍線呼應參照圖的藍色塊 |
 | 2026-08-16 | 題詞刪後半句，改「所有答案只代表今天的你」（無句點） | Sunny：原句「有點矯情」。「明天可以翻案」的替讀者總結感移除 |
 | 2026-08-16 | 署名連到 2025H2 信念清單那篇；**不做 GitHub star 引導** | 這副牌的受眾是電子報讀者不是工程師；終卡餘韻後放 star 請求會破壞情緒 |
+| 2026-08-19 | Meetup 簡報改放 Pages 的 `/deck/`，不走 Claude artifact 公開連結 | artifact 的公開分享擋掉含 `srcdoc` 完整文件的 iframe（實測：拿掉 iframe 的同份內容可公開，原版不行）。放 Pages 可原封保留實機 demo，網址也自己掌握 |
